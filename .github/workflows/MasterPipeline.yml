@@ -301,7 +301,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: allure-report-single-file
-          path: SMR_allure_report.html
+          path: allure-report/complete.html
 
       - name: Upload PDF Report
         if: always()
