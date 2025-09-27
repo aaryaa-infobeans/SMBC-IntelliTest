@@ -1,0 +1,41 @@
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 AI healing attempt 1 for: password input field
+INFO     TestAutomationFramework:logger.py:84 DOM snapshot saved: reports/dom_snapshot_password_input_field_20250927-165355.html
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+ERROR    TestAutomationFramework:logger.py:94 Error querying OpenAI: Must provide one of the `base_url` or `azure_endpoint` arguments, or the `AZURE_OPENAI_ENDPOINT` environment variable
+INFO     TestAutomationFramework:logger.py:84 Falling back to heuristic suggestions
+INFO     TestAutomationFramework:logger.py:84 Using fallback locator suggestion logic
+INFO     TestAutomationFramework:logger.py:84 AI healing attempt 2 for: password input field
+INFO     TestAutomationFramework:logger.py:84 DOM snapshot saved: reports/dom_snapshot_password_input_field_20250927-165355.html
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+ERROR    TestAutomationFramework:logger.py:94 Error querying OpenAI: Must provide one of the `base_url` or `azure_endpoint` arguments, or the `AZURE_OPENAI_ENDPOINT` environment variable
+INFO     TestAutomationFramework:logger.py:84 Falling back to heuristic suggestions
+INFO     TestAutomationFramework:logger.py:84 Using fallback locator suggestion logic
+INFO     TestAutomationFramework:logger.py:84 AI healing attempt 3 for: password input field
+INFO     TestAutomationFramework:logger.py:84 DOM snapshot saved: reports/dom_snapshot_password_input_field_20250927-165355.html
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+ERROR    TestAutomationFramework:logger.py:94 Error querying OpenAI: Must provide one of the `base_url` or `azure_endpoint` arguments, or the `AZURE_OPENAI_ENDPOINT` environment variable
+INFO     TestAutomationFramework:logger.py:84 Falling back to heuristic suggestions
+INFO     TestAutomationFramework:logger.py:84 Using fallback locator suggestion logic
+ERROR    TestAutomationFramework:logger.py:94 Maximum healing attempts (3) reached for: password input field
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
