@@ -171,6 +171,7 @@ jobs:
         env:
           BASE_URL: 'https://www.saucedemo.com/v1/'
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
           XRAY_API_BASE_URL: ${{ secrets.XRAY_BASE_URL || 'https://xray.cloud.getxray.app' }}
           XRAY_CLIENT_ID: ${{ secrets.XRAY_CLIENT_ID }}
           XRAY_CLIENT_SECRET: ${{ secrets.XRAY_CLIENT_SECRET }}
