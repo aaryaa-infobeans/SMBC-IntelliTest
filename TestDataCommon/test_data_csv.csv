@@ -1,4 +1,0 @@
-user_name,password,is_valid_user,expected_result
-standard_user,secret_sauce,True,Success
-locked_out_user,secret_sauce,False,Failure
-problem_user,secret_sauce,True,Success
