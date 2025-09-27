@@ -7,7 +7,7 @@ import os
 import time
 from typing import Any, Dict, Optional
 
-from openai import OpenAI
+from openai import AzureOpenAI
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Locator, Page
 
@@ -21,9 +21,14 @@ def get_client():
     global _client
     if _client is None:
         api_key = os.getenv("OPENAI_API_KEY")
+        api_end_point = os.getenv("AZURE_OPENAI_ENDPOINT")
         if not api_key:
             raise RuntimeError("OPENAI_API_KEY not set in environment")
-        _client = OpenAI(api_key=api_key)
+        _client = AzureOpenAI(
+            api_key=api_key,  # from portal
+            api_version="2024-05-01-preview",  # check docs for latest
+            azure_endpoint=api_end_point
+        )
     return _client
 
 
