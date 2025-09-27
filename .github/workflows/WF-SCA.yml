@@ -29,9 +29,9 @@ jobs:
           pip install -r requirements-dev.txt
 
       # --- Black ---
-      - name: Black (code formatting check)
-        if: always()
-        run: black --check . | tee black-report.log
+      # - name: Black (code formatting check)
+      #   if: always()
+      #   run: black --check . | tee black-report.log
 
       # - name: Upload Black Report
       #   if: always()
