@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  test-automation:
+    build:
+      context: ..
+      dockerfile: Docker/DockerFile
+    container_name: playwright-test-automation
+    volumes:
+      # Mount test results and reports to host for persistence
+      - ../allure-results:/app/allure-results
+      - ../test-results:/app/test-results
+      - ../screenshots:/app/screenshots
+      - ../logs:/app/logs
+      # Mount source code for development (optional - remove for production)
+      - ../SRC:/app/SRC
+      - ../testData:/app/testData
+      - ../Utilities:/app/Utilities
+    environment:
+      - PYTHONPATH=/app
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+      - DISPLAY=:99
+    networks:
+      - test-network
+    # Override default command for different test scenarios
+    command: >
+      sh -c "
+        echo 'Starting Playwright Test Automation...' &&
+        python -m pytest SRC/tests/ -v 
+        --alluredir=allure-results 
+        --junitxml=test-results/test-results.xml 
+        --html=test-results/report.html 
+        --self-contained-html
+      "
+
+  # Service for running specific test files or markers
+  test-specific:
+    build:
+      context: ..
+      dockerfile: Docker/DockerFile
+    container_name: playwright-test-specific
+    volumes:
+      - ../allure-results:/app/allure-results
+      - ../test-results:/app/test-results
+      - ../screenshots:/app/screenshots
+      - ../logs:/app/logs
+      - ../SRC:/app/SRC
+      - ../testData:/app/testData
+      - ../Utilities:/app/Utilities
+    environment:
+      - PYTHONPATH=/app
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+      - DISPLAY=:99
+    networks:
+      - test-network
+    profiles:
+      - manual
+    # This service won't start by default, use: docker-compose --profile manual up test-specific
+    command: >
+      sh -c "
+        echo 'Waiting for manual test execution...' &&
+        tail -f /dev/null
+      "
+
+  # Allure report service
+  allure-report:
+    image: frankescobar/allure-docker-service
+    container_name: allure-report-service
+    ports:
+      - "5050:5050"
+    volumes:
+      - ../allure-results:/app/allure-results
+    environment:
+      - ALLURE_OPTS=-Djava.awt.headless=true
+    networks:
+      - test-network
+    profiles:
+      - reports
+    depends_on:
+      - test-automation
+
+networks:
+  test-network:
+    driver: bridge
+
+volumes:
+  allure-results:
+  test-results:
+  screenshots:
+  logs:

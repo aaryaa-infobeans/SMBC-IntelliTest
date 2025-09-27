@@ -1,0 +1,46 @@
+[flake8]
+# Match pylint's max-line-length
+max-line-length = 120
+
+# Ignore certain errors to align with project needs
+ignore = 
+    # Allow lambda assignments (used in test fixtures)
+    E731,
+    # Allow line breaks before binary operators (W503 is deprecated)
+    W503,
+    # Don't require docstrings (handled by pylint)
+    D100, D101, D102, D103, D104, D105, D106, D107,
+    # Allow imports at bottom of file for circular dependency resolution
+    E402
+
+# Exclude directories
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    build,
+    dist,
+    *.egg-info,
+    .pytest_cache,
+    .mypy_cache,
+    htmlcov,
+    .coverage
+
+# Per-file ignores for specific cases
+per-file-ignores =
+    # Allow unused imports in __init__ files
+    __init__.py: F401,
+    # Allow redefinition and unused imports in conftest
+    conftest.py: F401, F811,
+    # Tests can have longer lines and different conventions
+    test_*.py: E501
+
+# McCabe complexity
+max-complexity = 10
+
+# Format for output
+format = %(path)s:%(row)d:%(col)d: %(code)s %(text)s
+
+# Statistics
+statistics = True
+count = True

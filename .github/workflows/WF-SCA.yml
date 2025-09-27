@@ -1,0 +1,117 @@
+name: WF-Static Code Analysis
+
+on:
+  # pull_request:
+  push:
+    branches:
+      - master
+      - dev
+  workflow_dispatch:
+  workflow_call:   # 👈 This makes it reusable in other workflows
+
+jobs:
+  static-analysis:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      # --- Black ---
+      - name: Black (code formatting check)
+        if: always()
+        run: black --check . | tee black-report.log
+
+      # - name: Upload Black Report
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: black-format-report
+      #     path: black-report.log
+
+      # --- Isort ---
+      - name: Isort (import sorting check)
+        if: always()
+        run: isort --check-only . | tee isort-report.log
+
+      # - name: Upload Isort Report
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: isort-report
+      #     path: isort-report.log
+
+      # --- Pylint ---
+      - name: Pylint (strict linting)
+        if: always()
+        run: pylint --rcfile=pyproject.toml SRC Utilities TestDataCommon | tee pylint-report.log
+
+      # - name: Upload Pylint Report
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: pylint-report
+      #     path: pylint-report.log
+
+      # --- Mypy ---
+      - name: Mypy (type checking)
+        if: always()
+        run: mypy --config-file=pyproject.toml SRC Utilities TestDataCommon | tee mypy-report.log
+        shell: pwsh
+
+      # - name: Upload Mypy Report
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: mypy-type-check-report
+      #     path: mypy-report.log
+
+      # --- Bandit ---
+      - name: Bandit (security scan)
+        if: always()
+        run: bandit -c pyproject.toml -r SRC Utilities TestDataCommon -f html -o bandit-report.html
+        shell: pwsh
+
+      # - name: Upload Bandit Report
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: bandit-security-report
+      #     path: bandit-report.html
+
+      # --- Pytest Collect ---
+      - name: Pytest collect (import sanity check)
+        if: always()
+        run: pytest --collect-only | tee pytest-collect.log
+
+      # - name: Upload Pytest Collect Log
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: pytest-collect-log
+      #     path: pytest-collect.log
+
+      # --- Final Bundle ---
+      - name: Upload All SCA Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-reports
+          path: |
+            black-report.log
+            isort-report.log
+            pylint-report.log
+            mypy-report.log
+            bandit-report.html
+            pytest-collect.log

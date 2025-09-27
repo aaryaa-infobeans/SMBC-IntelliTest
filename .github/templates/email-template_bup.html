@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Results Notification</title>
+</head>
+<body>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <div>
+            <img src="https://automated-360.com/wp-content/uploads/2022/08/Playwright-300x300.png" alt="Playwright" style="width: 6.25rem;">
+        </div>
+        <p>Hello Team,</p>
+        <p>
+            The Playwright test run triggered by <strong>{{GITHUB_ACTOR}}</strong> has finished. Please find the attached test reports for a quick review.
+        </p>
+        <p>
+            Test execution status is <strong>{{TEST_RESULT}}</strong> for the 
+            <strong>{{GITHUB_REF}}</strong> branch.
+        </p>
+        
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <h3 style="color: white; text-align: center; margin: 0 0 20px 0; font-size: 18px; font-weight: bold;">📊 Test Execution Summary</h3>
+            
+            <table style="width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.95); border-radius: 8px; overflow: hidden;">
+                <thead>
+                    <tr style="background: rgba(102, 126, 234, 0.8); color: white;">
+                        <th style="padding: 12px; text-align: left; font-weight: bold; border-bottom: 2px solid #667eea;">Status</th>
+                        <th style="padding: 12px; text-align: center; font-weight: bold; border-bottom: 2px solid #667eea;">Count</th>
+                        <th style="padding: 12px; text-align: center; font-weight: bold; border-bottom: 2px solid #667eea;">Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid #e0e0e0;">
+                        <td style="padding: 12px; font-weight: bold; color: #2e7d32;">✅ Total Tests</td>
+                        <td style="padding: 12px; text-align: center; font-weight: bold; font-size: 16px; color: #1565c0;">{{TOTAL_TESTS}}</td>
+                        <td style="padding: 12px; text-align: center; color: #666;">100%</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #e0e0e0; background: rgba(76, 175, 80, 0.1);">
+                        <td style="padding: 12px; font-weight: bold; color: #2e7d32;">🟢 Passed</td>
+                        <td style="padding: 12px; text-align: center; font-weight: bold; font-size: 16px; color: #2e7d32;">{{PASSED_TESTS}}</td>
+                        <td style="padding: 12px; text-align: center; color: #2e7d32; font-weight: bold;">{{PASSED_PERCENT}}%</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #e0e0e0; background: rgba(244, 67, 54, 0.1);">
+                        <td style="padding: 12px; font-weight: bold; color: #d32f2f;">🔴 Failed</td>
+                        <td style="padding: 12px; text-align: center; font-weight: bold; font-size: 16px; color: #d32f2f;">{{FAILED_TESTS}}</td>
+                        <td style="padding: 12px; text-align: center; color: #d32f2f; font-weight: bold;">{{FAILED_PERCENT}}%</td>
+                    </tr>
+                    <tr style="background: rgba(158, 158, 158, 0.1);">
+                        <td style="padding: 12px; font-weight: bold; color: #616161;">⚪ Skipped</td>
+                        <td style="padding: 12px; text-align: center; font-weight: bold; font-size: 16px; color: #616161;">{{SKIPPED_TESTS}}</td>
+                        <td style="padding: 12px; text-align: center; color: #616161; font-weight: bold;">{{SKIPPED_PERCENT}}%</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 6px; text-align: center;">
+                <span style="color: white; font-size: 14px;">
+                    <strong>Success Rate:</strong> 
+                    <span style="font-size: 16px; font-weight: bold;">{{SUCCESS_RATE}}%</span>
+                </span>
+            </div>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #007bff;">
+            <h4 style="margin: 0 0 15px 0; color: #495057;">📋 Execution Details</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                <tr>
+                    <td style="text-align: right; padding: 8px 15px 8px 0; font-weight: bold; color: #6c757d; width: 120px;">Repository:</td>
+                    <td style="padding: 8px 0; color: #495057;">{{GITHUB_REPOSITORY}}</td>
+                </tr>
+                <tr>
+                    <td style="text-align: right; padding: 8px 15px 8px 0; font-weight: bold; color: #6c757d;">Workflow:</td>
+                    <td style="padding: 8px 0; color: #495057;">{{GITHUB_WORKFLOW}}</td>
+                </tr>
+                <tr>
+                    <td style="text-align: right; padding: 8px 15px 8px 0; font-weight: bold; color: #6c757d;">Run Number:</td>
+                    <td style="padding: 8px 0; color: #495057;">{{GITHUB_RUN_NUMBER}}</td>
+                </tr>
+                <tr>
+                    <td style="text-align: right; padding: 8px 15px 8px 0; font-weight: bold; color: #6c757d;">Run ID:</td>
+                    <td style="padding: 8px 0; color: #495057;">{{GITHUB_RUN_ID}}</td>
+                </tr>
+                <tr>
+                    <td style="text-align: right; padding: 8px 15px 8px 0; font-weight: bold; color: #6c757d;">View Results:</td>
+                    <td style="padding: 8px 0;">
+                        <a href="{{GITHUB_SERVER_URL}}/{{GITHUB_REPOSITORY}}/actions/runs/{{GITHUB_RUN_ID}}" 
+                           style="color: #007bff; text-decoration: none; font-weight: bold;">
+                            🔗 GitHub Actions Run
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>Regards,<br>SMR QA Automation Team<br</p>
+    </div>
+</body>
+</html>

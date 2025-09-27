@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Results Notification</title>
+ </head>
+ <body style="background-color:#F2F2F2; font-family:Arial, sans-serif; padding:40px;">
+  <div style="max-width:700px; margin:auto; background:#FFFFFF; border:1px solid #D2D2D2; border-radius:12px; padding:30px; color:#333; box-shadow:0 4px 14px rgba(0,0,0,0.08);">
+    
+    <!-- Header -->
+    <div style="background:#E9E9E9; padding:18px; border-radius:8px; text-align:center; border:1px solid #E0E0E0; margin-bottom:25px;">
+      <h2 style="margin:0; font-size:20px; color:#222;">📢 SMR Project Test Execution Report</h2>
+    </div>
+
+    <!-- Intro -->
+    <p style="font-size:15px; margin:0 0 18px 0;">Hello Team,</p>
+    <p style="font-size:15px; line-height:1.6; margin:0 0 20px 0;">
+      The <strong>SMR Project</strong> test run triggered by <strong>Automation action</strong> has finished.  
+      Attached are the test reports for your review.
+    </p>
+    <p style="font-size:15px; margin:0 0 25px 0;">
+      Test execution status is <strong>{{TEST_RESULT}}</strong> for the <strong>{{GITHUB_REF}}</strong> branch.
+    </p>
+
+    <!-- Summary Card -->
+    <div style="background:#F9F9F9; border:1px solid #E0E0E0; border-radius:10px; margin-bottom:30px;">
+      <div style="background:#D2D2D2; padding:12px; border-radius:10px 10px 0 0; text-align:center;">
+        <h3 style="margin:0; font-size:16px; color:#222;">📊 Test Execution Summary</h3>
+      </div>
+      <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <thead>
+          <tr style="background:#E9E9E9; color:#333; border-bottom:1px solid #E0E0E0;">
+            <th style="padding:12px; text-align:left;">Status</th>
+            <th style="padding:12px; text-align:center;">Count</th>
+            <th style="padding:12px; text-align:center;">Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #E0E0E0;">
+            <td style="padding:12px; font-weight:bold;">✅ Total Tests</td>
+            <td style="padding:12px; text-align:center;">{{TOTAL_TESTS}}</td>
+            <td style="padding:12px; text-align:center;">100%</td>
+          </tr>
+          <tr style="border-bottom:1px solid #E0E0E0; background:#F2F2F2;">
+            <td style="padding:12px; font-weight:bold; color:#2e7d32;">🟢 Passed</td>
+            <td style="padding:12px; text-align:center; color:#2e7d32;">{{PASSED_TESTS}}</td>
+            <td style="padding:12px; text-align:center; color:#2e7d32;">{{PASSED_PERCENT}}%</td>
+          </tr>
+          <tr style="border-bottom:1px solid #E0E0E0;">
+            <td style="padding:12px; font-weight:bold; color:#d32f2f;">🔴 Failed</td>
+            <td style="padding:12px; text-align:center; color:#d32f2f;">{{FAILED_TESTS}}</td>
+            <td style="padding:12px; text-align:center; color:#d32f2f;">{{FAILED_PERCENT}}%</td>
+          </tr>
+          <tr style="background:#F2F2F2;">
+            <td style="padding:12px; font-weight:bold; color:#616161;">⚪ Skipped</td>
+            <td style="padding:12px; text-align:center; color:#616161;">{{SKIPPED_TESTS}}</td>
+            <td style="padding:12px; text-align:center; color:#616161;">{{SKIPPED_PERCENT}}%</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin:0; background:#E9E9E9; padding:14px; border-top:1px solid #E0E0E0; border-radius:0 0 10px 10px; text-align:center;">
+        <span style="font-size:15px; color:#333;">
+          <strong>✅ Success Rate:</strong> {{SUCCESS_RATE}}%
+        </span>
+      </div>
+    </div>
+
+    <!-- Execution Details -->
+    <div style="background:#FFFFFF; border:1px solid #E0E0E0; border-radius:10px; margin-bottom:30px;">
+      <div style="background:#D2D2D2; padding:10px 15px; border-radius:10px 10px 0 0; font-size:14px; font-weight:bold; color:#222;">
+        📋 Execution Details
+      </div>
+      <table style="width:100%; font-size:14px; border-collapse:collapse;">
+        <tr style="background:#F9F9F9;">
+          <td style="padding:8px 12px; font-weight:bold; color:#666; width:130px;">Repository:</td>
+          <td style="padding:8px 12px; color:#333;">{{GITHUB_REPOSITORY}}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; font-weight:bold; color:#666;">Workflow:</td>
+          <td style="padding:8px 12px; color:#333;">{{GITHUB_WORKFLOW}}</td>
+        </tr>
+        <tr style="background:#F9F9F9;">
+          <td style="padding:8px 12px; font-weight:bold; color:#666;">Run Number:</td>
+          <td style="padding:8px 12px; color:#333;">{{GITHUB_RUN_NUMBER}}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px; font-weight:bold; color:#666;">Run ID:</td>
+          <td style="padding:8px 12px; color:#333;">{{GITHUB_RUN_ID}}</td>
+        </tr>
+        <tr style="background:#F9F9F9;">
+          <td style="padding:8px 12px; font-weight:bold; color:#666;">View Results:</td>
+          <td style="padding:8px 12px;">
+            <a href="{{GITHUB_SERVER_URL}}/{{GITHUB_REPOSITORY}}/actions/runs/{{GITHUB_RUN_ID}}" 
+               style="color:#0056b3; text-decoration:none; font-weight:bold;">🔗 GitHub Actions Run</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <p style="font-size:13px; color:#555; text-align:center; margin:0; border-top:1px solid #E0E0E0; padding-top:15px;">
+      Regards,<br><strong>SMR QA Automation Team</strong>
+    </p>
+  </div>
+</body>
+
+</html>
