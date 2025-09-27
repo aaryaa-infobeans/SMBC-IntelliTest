@@ -7,7 +7,7 @@ A comprehensive Python-based test automation framework using **Pytest** and **Pl
 ## 🏗️ Project Structure
 
 ```
-PlayPyTestAutomation/
+SMBC-IntelliTest/
 ├── SRC/                          # Source code
 │   ├── tests/                    # Test cases
 │   │   ├── tests_ui/            # UI test scenarios
