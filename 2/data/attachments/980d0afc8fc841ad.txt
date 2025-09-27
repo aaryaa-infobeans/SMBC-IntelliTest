@@ -1,0 +1,105 @@
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 AI healing attempt 1 for: password input field
+INFO     TestAutomationFramework:logger.py:84 DOM snapshot saved: reports/dom_snapshot_password_input_field_20250927-161020.html
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+INFO     TestAutomationFramework:logger.py:84 AI suggested alternative locator: input[type='password']
+INFO     TestAutomationFramework:logger.py:84 Successfully healed element using AI locator: input[type='password']
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#passwd' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered password
+INFO     TestAutomationFramework:logger.py:84 Clicking login button
+DEBUG    TestAutomationFramework:logger.py:79 Clicking login button
+DEBUG    TestAutomationFramework:logger.py:79 Clicking element '#login-button'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: login submit button using locator: #login-button
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #login-button
+INFO     TestAutomationFramework:logger.py:84 Successfully clicked element '#login-button' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully clicked login button
+INFO     TestAutomationFramework:logger.py:84 Login completed successfully
+INFO     TestAutomationFramework:logger.py:84 Clicking logout button
+DEBUG    TestAutomationFramework:logger.py:79 Initiating logout process
+DEBUG    TestAutomationFramework:logger.py:79 Opened menu for logout
+DEBUG    TestAutomationFramework:logger.py:79 Clicking element '//*[contains(text(), "Lgout")]'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: logout button using locator: //*[contains(text(), "Lgout")]
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: //*[contains(text(), "Lgout")]
+INFO     TestAutomationFramework:logger.py:84 AI healing attempt 2 for: logout button
+INFO     TestAutomationFramework:logger.py:84 DOM snapshot saved: reports/dom_snapshot_logout_button_20250927-161020.html
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: //button[contains(text(), 'Logout')]
+INFO     TestAutomationFramework:logger.py:84 AI suggested alternative locator: //button[contains(text(), 'Logout')]
+WARNING  TestAutomationFramework:logger.py:89 AI suggested locator found no elements: //button[contains(text(), 'Logout')]
+DEBUG    TestAutomationFramework:logger.py:79 Created wildcard variation: //button[contains(text(), 'Logout')] -> //*[contains(text(), 'Logout')]
+INFO     TestAutomationFramework:logger.py:84 Trying wildcard variation: //*[contains(text(), 'Logout')]
+INFO     TestAutomationFramework:logger.py:84 Successfully healed element using wildcard variation: //*[contains(text(), 'Logout')]
+INFO     TestAutomationFramework:logger.py:84 Successfully clicked element '//*[contains(text(), "Lgout")]' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully completed logout process
+INFO     TestAutomationFramework:logger.py:84 Logout completed successfully
+INFO     TestAutomationFramework:logger.py:84 Verifying logout success with expected URL: https://www.saucedemo.com/v1//index.html | Actual URL: https://www.saucedemo.com/v1/index.html
+ERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 1 failed: Expected URL: https://www.saucedemo.com/v1//index.html, but got: https://www.saucedemo.com/v1/index.html. Retrying in 1s...
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 AI healing attempt 3 for: password input field
+INFO     TestAutomationFramework:logger.py:84 DOM snapshot saved: reports/dom_snapshot_password_input_field_20250927-161022.html
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+INFO     TestAutomationFramework:logger.py:84 AI suggested alternative locator: input[type='password']
+INFO     TestAutomationFramework:logger.py:84 Successfully healed element using AI locator: input[type='password']
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#passwd' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered password
+INFO     TestAutomationFramework:logger.py:84 Clicking login button
+DEBUG    TestAutomationFramework:logger.py:79 Clicking login button
+DEBUG    TestAutomationFramework:logger.py:79 Clicking element '#login-button'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: login submit button using locator: #login-button
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #login-button
+INFO     TestAutomationFramework:logger.py:84 Successfully clicked element '#login-button' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully clicked login button
+INFO     TestAutomationFramework:logger.py:84 Login completed successfully
+INFO     TestAutomationFramework:logger.py:84 Clicking logout button
+DEBUG    TestAutomationFramework:logger.py:79 Initiating logout process
+DEBUG    TestAutomationFramework:logger.py:79 Opened menu for logout
+DEBUG    TestAutomationFramework:logger.py:79 Clicking element '//*[contains(text(), "Lgout")]'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: logout button using locator: //*[contains(text(), "Lgout")]
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: //*[contains(text(), "Lgout")]
+ERROR    TestAutomationFramework:logger.py:94 Maximum healing attempts (3) reached for: logout button
+ERROR    TestAutomationFramework:logger.py:94 AutoHealer could not locate element 'logout button' with locator '//*[contains(text(), "Lgout")]' after all healing attempts
+ERROR    TestAutomationFramework:logger.py:94 Click action failed for '//*[contains(text(), "Lgout")]': Element 'logout button' not found with locator '//*[contains(text(), "Lgout")]' even after AI healing attempts
+ERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 2 failed: Click action failed for '//*[contains(text(), "Lgout")]': Element 'logout button' not found with locator '//*[contains(text(), "Lgout")]' even after AI healing attempts. Retrying in 2s...
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #user-name
+ERROR    TestAutomationFramework:logger.py:94 Maximum healing attempts (3) reached for: username input field
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#user-name': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#user-name") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
