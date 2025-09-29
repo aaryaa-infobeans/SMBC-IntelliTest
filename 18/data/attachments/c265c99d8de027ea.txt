@@ -1,0 +1,8 @@
+INFO     TestAutomationFramework:logger.py:84 Session created successfully
+INFO     TestAutomationFramework:logger.py:84 Making POST request to /booking, with kwargs: {'data': '{"firstname": "Antonio", "lastname": "Morris", "totalprice": 8655, "depositpaid": false, "bookingdates": {"checkin": "1987-11-06", "checkout": "1986-08-09"}, "additionalneeds": "Smile blue reality camera score population as film. Site its many fund appear seem check.\\nLawyer people after seek. Agent recognize simple machine sea cell collection."}', 'timeout': 30}
+INFO     TestAutomationFramework:logger.py:84 POST request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Request time taken by __post_request: 0.23852872848510742
+INFO     TestAutomationFramework:logger.py:84 Request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Booking ID: 4023
+INFO     TestAutomationFramework:logger.py:84 Session closed successfully
+INFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0012943744659423828
