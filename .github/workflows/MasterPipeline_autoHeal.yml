@@ -133,7 +133,7 @@ jobs:
             # The message content. Supports HTML up to a certain level (interpreted by MS Teams). Can also be empty.
           message: ${{ env.testExecutionStartedMessage }}
       
-      - name: Execute Tests
+      - name: Execute Tests with custom runner
         continue-on-error: true
         if: ${{ github.event.inputs.mode == 'parallel-with-custom-runner' }}
         env:
@@ -165,7 +165,7 @@ jobs:
 
  
 
-      - name: Execute Tests
+      - name: Execute Tests with pytest
         id: execute_tests  # Add this ID to reference the step
         # run when mode is not parallel-with-custom-runner
         if: ${{ github.event.inputs.mode != 'parallel-with-custom-runner' }}
@@ -227,7 +227,7 @@ jobs:
 
           else
             echo "➡ Running sequentially"
-            python -m pytest $TEST_ARGS --jira-xray --client-secret-auth --cloud -v --junitxml=test-results.xml --json-report --json-report-file=test-results.json || echo "TEST_FAILED=1" >> $GITHUB_ENV
+            python -m pytest $TEST_ARGS SRC\tests\tests_ui\test_login.py --jira-xray --client-secret-auth --cloud -v --junitxml=test-results.xml --json-report --json-report-file=test-results.json || echo "TEST_FAILED=1" >> $GITHUB_ENV
           fi
 
 
