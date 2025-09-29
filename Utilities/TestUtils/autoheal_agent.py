@@ -42,9 +42,18 @@ def ai_autoheal_failure(test_name, failure_log, dom_snapshot=""):
     Failure log: {failure_log}
     DOM snapshot (truncated): {dom_snapshot}
 
-    Suggest a corrected locator or test update (minimal change).
-    Provide explanation, confidence score, and a patch (unified diff).
-    Return JSON with: issue_type, confidence, explanation, patch
+    Analyze the test failure and suggest a fix. Return ONLY a valid JSON object with these exact fields:
+    {{
+        "issue_type": "locator_issue|timing_issue|data_issue|other",
+        "confidence": 0.0-1.0,
+        "explanation": "Brief description of the issue and fix",
+        "patch": "Valid unified diff patch or empty string if no code change needed"
+    }}
+    
+    Important: 
+    - Return ONLY valid JSON, no markdown or extra text
+    - Ensure patch is a proper unified diff format if provided
+    - Set confidence between 0.0 and 1.0
     """
     # Check if client is available
     if not client:
@@ -72,22 +81,39 @@ def ai_autoheal_failure(test_name, failure_log, dom_snapshot=""):
         content = response.choices[0].message.content
         # Try to parse JSON, handle cases where response might not be pure JSON
         try:
+            # First try to parse as direct JSON
             return json.loads(content)
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON parsing error: {str(e)}")
+            print(f"Raw response: {content[:500]}...")
+            
             # Extract JSON if it's embedded in markdown or other text
             import re
-
-            json_match = re.search(r"\{.*\}", content, re.DOTALL)
-            if json_match:
-                return json.loads(json_match.group())
-            else:
-                # Fallback response if no valid JSON found
-                return {
-                    "issue_type": "parsing_error",
-                    "confidence": 0.0,
-                    "explanation": f"Could not parse AI response: {content}",
-                    "patch": "",
-                }
+            
+            # Try to find JSON blocks in markdown
+            json_patterns = [
+                r'```json\s*({.*?})\s*```',
+                r'```\s*({.*?})\s*```', 
+                r'({\s*".*?})',
+                r'\{[^{}]*\{[^{}]*\}[^{}]*\}',  # Nested objects
+                r'\{[^{}]*\}'  # Simple objects
+            ]
+            
+            for pattern in json_patterns:
+                json_match = re.search(pattern, content, re.DOTALL)
+                if json_match:
+                    try:
+                        return json.loads(json_match.group(1))
+                    except (json.JSONDecodeError, IndexError):
+                        continue
+            
+            # Fallback response if no valid JSON found
+            return {
+                "issue_type": "parsing_error",
+                "confidence": 0.0,
+                "explanation": f"Could not parse AI response. Error: {str(e)}",
+                "patch": "",
+            }
     except Exception as e:
         print(f"❌ Error calling OpenAI API: {str(e)}")
         return {"issue_type": "api_error", "confidence": 0.0, "explanation": f"API error: {str(e)}", "patch": ""}
@@ -111,18 +137,50 @@ def apply_patch_and_pr(test_name, patch, explanation, confidence):
         branch_name = f"{BRANCH_PREFIX}{test_name.replace('/', '_').replace('::', '_')}_{os.urandom(4).hex()}"
         patch_file = "autoheal.patch"
 
-        # Write and apply patch
-        with open(patch_file, "w") as f:
+        # Write patch with proper formatting
+        with open(patch_file, "w", encoding="utf-8") as f:
+            # Ensure patch has proper headers if missing
+            if not patch.startswith("diff ") and not patch.startswith("--- "):
+                # Try to format as a basic patch if it looks like a simple replacement
+                if "@@" not in patch:
+                    print(f"⚠️ Patch doesn't appear to be in unified diff format for {test_name}")
+                    print(f"Raw patch content: {patch[:200]}...")
+                    return None
             f.write(patch)
 
-        # Apply patch with error handling
-        result = subprocess.run(["git", "apply", "--check", patch_file], capture_output=True, text=True, check=False)
+        # Validate patch format first
+        result = subprocess.run(["git", "apply", "--check", "--ignore-whitespace", patch_file], 
+                              capture_output=True, text=True, check=False)
         if result.returncode != 0:
             print(f"❌ Patch validation failed for {test_name}: {result.stderr}")
+            # Try with different options
+            result = subprocess.run(["git", "apply", "--check", "--ignore-space-change", "--ignore-whitespace", patch_file], 
+                                  capture_output=True, text=True, check=False)
+            if result.returncode != 0:
+                print(f"❌ Patch validation failed with relaxed options: {result.stderr}")
+                return None
+
+        # Create branch first, then apply patch
+        subprocess.run(["git", "checkout", "-b", branch_name], check=True)
+        
+        # Apply patch
+        result = subprocess.run(["git", "apply", "--ignore-whitespace", patch_file], 
+                              capture_output=True, text=True, check=False)
+        if result.returncode != 0:
+            print(f"❌ Failed to apply patch: {result.stderr}")
+            # Try to rollback
+            subprocess.run(["git", "checkout", BASE_BRANCH], check=False)
+            subprocess.run(["git", "branch", "-D", branch_name], check=False)
             return None
 
-        subprocess.run(["git", "apply", patch_file], check=True)
-        subprocess.run(["git", "checkout", "-b", branch_name], check=True)
+        # Check if there are any changes to commit
+        status_result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+        if not status_result.stdout.strip():
+            print(f"⚠️ No changes detected after applying patch for {test_name}")
+            subprocess.run(["git", "checkout", BASE_BRANCH], check=False)
+            subprocess.run(["git", "branch", "-D", branch_name], check=False)
+            return None
+
         subprocess.run(["git", "add", "."], check=True)
         subprocess.run(
             ["git", "commit", "-m", f"🔧 AutoHeal: Fix for {test_name}\n\nConfidence: {confidence}\n{explanation}"],
@@ -169,6 +227,9 @@ def apply_patch_and_pr(test_name, patch, explanation, confidence):
 
     except subprocess.CalledProcessError as e:
         print(f"❌ Git operation failed for {test_name}: {e}")
+        # Cleanup failed branch
+        subprocess.run(["git", "checkout", BASE_BRANCH], check=False)
+        subprocess.run(["git", "branch", "-D", branch_name], check=False)
         return None
     except Exception as e:
         print(f"❌ Failed to create PR for {test_name}: {e}")
@@ -181,6 +242,8 @@ def apply_patch_and_pr(test_name, patch, explanation, confidence):
 
 def create_manual_review_pr(test_name, failure_log, patch_content):
     """Create a PR for manual review when AI is not available."""
+    branch_name = None
+    review_file = None
     try:
         # Validate required environment variables
         if not GITHUB_TOKEN or not REPO_NAME:
@@ -193,12 +256,19 @@ def create_manual_review_pr(test_name, failure_log, patch_content):
 
         # Create manual review file
         review_file = f"MANUAL_REVIEW_{test_name.replace('/', '_').replace('::', '_')}.md"
-        with open(review_file, "w") as f:
+        with open(review_file, "w", encoding="utf-8") as f:
             f.write(patch_content)
 
-        # Git operations
+        # Git operations with better error handling
         subprocess.run(["git", "checkout", "-b", branch_name], check=True)
         subprocess.run(["git", "add", review_file], check=True)
+        
+        # Check if there are changes to commit
+        status_result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+        if not status_result.stdout.strip():
+            print(f"⚠️ No changes to commit for manual review of {test_name}")
+            return None
+            
         subprocess.run(
             ["git", "commit", "-m", f"📋 Manual Review: {test_name}\n\nTest failure requires manual investigation"],
             check=True,
@@ -248,15 +318,19 @@ def create_manual_review_pr(test_name, failure_log, patch_content):
         except Exception as e:
             print(f"⚠️ Could not add labels to manual review PR: {e}")
 
-        # Clean up review file
-        if os.path.exists(review_file):
-            os.remove(review_file)
-
         return pr.html_url
 
     except Exception as e:
         print(f"❌ Failed to create manual review PR for {test_name}: {e}")
+        # Cleanup on failure
+        if branch_name:
+            subprocess.run(["git", "checkout", BASE_BRANCH], check=False)
+            subprocess.run(["git", "branch", "-D", branch_name], check=False)
         return None
+    finally:
+        # Clean up review file
+        if review_file and os.path.exists(review_file):
+            os.remove(review_file)
 
 
 def process_failures():
@@ -331,33 +405,63 @@ def process_failures():
 
             # Get AI healing suggestion
             healing = ai_autoheal_failure(test_name, failure_log, dom_snapshot)
+            
+            # Handle different confidence levels and error types
+            confidence = healing.get("confidence", 0)
+            issue_type = healing.get("issue_type", "unknown")
+            patch = healing.get("patch", "")
+            
+            # Validate confidence is a number
+            try:
+                confidence = float(confidence)
+            except (ValueError, TypeError):
+                print(f"⚠️ Invalid confidence value for {test_name}: {confidence}")
+                confidence = 0.0
 
-            if healing.get("confidence", 0) >= 0.7:
-                print(f"✅ High confidence fix found (confidence: {healing['confidence']:.2f})")
-                pr_url = apply_patch_and_pr(test_name, healing["patch"], healing["explanation"], healing["confidence"])
+            if confidence >= 0.7 and patch and patch.strip():
+                print(f"✅ High confidence fix found (confidence: {confidence:.2f})")
+                pr_url = apply_patch_and_pr(test_name, patch, healing["explanation"], confidence)
                 if pr_url:
                     healed_count += 1
-            elif healing.get("issue_type") in ["client_error", "api_error"]:
-                print(f"⚠️ API issue detected - creating manual review PR for {test_name}")
+                    print(f"✨ AutoHeal PR created: {pr_url}")
+            elif issue_type in ["client_error", "api_error", "parsing_error"]:
+                print(f"⚠️ AI issue detected ({issue_type}) - creating manual review PR for {test_name}")
                 # Create a PR with failure information for manual review
                 manual_patch = f"""# Manual Review Required for Test: {test_name}
 
+## Issue Type: {issue_type}
+
 ## Test Failure Details:
-{failure_log[:1000]}...
+```
+{failure_log[:1000]}
+```
+
+## AutoHeal Analysis:
+- **Confidence:** {confidence}
+- **Explanation:** {healing.get('explanation', 'No explanation provided')}
+- **Issue:** {issue_type}
+
+## Manual Investigation Steps:
+1. Review the test failure details above
+2. Check if locators need updating
+3. Verify test data and logic
+4. Apply necessary fixes manually
+5. Close this PR after resolution
 
 ## Notes:
-- AutoHeal AI was not available
-- Manual investigation required
-- Check locators and test logic
+- AutoHeal AI encountered an issue during analysis
+- This requires human investigation and resolution
 """
                 manual_pr_url = create_manual_review_pr(test_name, failure_log, manual_patch)
                 if manual_pr_url:
                     print(f"📋 Manual review PR created: {manual_pr_url}")
             else:
-                print(f"⚠️ Skipping {test_name} (low confidence: {healing.get('confidence', 0):.2f})")
+                print(f"⚠️ Skipping {test_name} (confidence: {confidence:.2f}, patch: {'present' if patch else 'empty'})")
 
         except Exception as e:
-            print(f"❌ Error processing {test_name}: {e}")
+            print(f"❌ Error processing {test_name}: {str(e)}")
+            import traceback
+            print(f"Detailed error: {traceback.format_exc()}")
             continue
 
     print(f"\n🎉 AutoHeal Summary: Created {healed_count} PR(s) out of {len(failed_tests)} failed tests")

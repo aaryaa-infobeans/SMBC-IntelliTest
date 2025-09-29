@@ -238,6 +238,9 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
         run: |
+          # Configure Git user identity for commits
+          git config --global user.email "autoheal@github-actions.com"
+          git config --global user.name "AutoHeal Agent"
           python Utilities/TestUtils/autoheal_agent.py
 
 
