@@ -1,5 +1,5 @@
 --- a/SRC/pages/login_page.py
 +++ b/SRC/pages/login_page.py
-@@ -13,1 +13,1 @@
--    __loc_password_input = "#passwd"  # nosec - This is a CSS selector, not a real password
-+    __loc_password_input = "input[type='password']"  # nosec - This is a CSS selector, not a real password
+@@ -16,1 +16,1 @@
+-    __loc_logout_button = '//*[contains(text(), "Lgout")]'
++    __loc_logout_button = '//a[contains(text(), 'Logout')]'
