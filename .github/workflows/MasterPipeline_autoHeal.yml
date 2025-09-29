@@ -68,6 +68,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
+      issues: write
+      repository-projects: write
 
     steps:
       - name: Checkout code
@@ -239,44 +242,67 @@ jobs:
         run: |
           python Utilities/TestUtils/autoheal_agent.py
 
-      - name: Create Pull Request for AutoHeal fixes
+      - name: Check for AutoHeal changes in SRC/pages
         if: env.TEST_FAILED == '1'
+        id: check-changes
+        run: |
+          if git diff --quiet -- SRC/pages/; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No files were modified by AutoHeal in SRC/pages/"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Files modified by AutoHeal in SRC/pages/:"
+            git diff --name-only -- SRC/pages/
+          fi
+
+      - name: Create Pull Request for AutoHeal fixes
+        if: env.TEST_FAILED == '1' && steps.check-changes.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "🔧 AutoHeal: Fix failing test locators"
+          committer: GitHub Actions <actions@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           branch: autoheal/locator-fixes-${{ github.run_id }}
-          title: "🔧 AutoHeal: Fix failing test locators from run #${{ github.run_id }}"
+          branch-suffix: short-commit-hash
+          title: "🔧 AutoHeal: Fix page object locators from run #${{ github.run_id }}"
           body: |
-            ## 🔧 AutoHeal Locator Fixes
+            ## 🔧 AutoHeal Page Object Locator Fixes
             
-            This PR contains automated locator fixes detected by the AutoHeal system.
+            This PR contains automated locator fixes for **page objects only** (`SRC/pages/`) detected by the AutoHeal system.
             
             ### 🎯 Details
             - **Trigger**: Test execution run #${{ github.run_id }}
             - **Branch**: `${{ github.ref_name }}`
             - **Commit**: ${{ github.sha }}
+            - **Workflow**: ${{ github.workflow }}
+            - **Scope**: `SRC/pages/*.py` files only
             
             ### 🔄 Changes Applied
-            The AutoHeal agent analyzed failed locators and applied AI-suggested improvements.
+            The AutoHeal agent analyzed failed locators in page object files and applied AI-suggested improvements.
             
             ### 🧪 Testing Required
             Please review the changes and verify that:
             1. The new locators are more robust and reliable
-            2. All affected tests pass with the updated locators
-            3. No unintended side effects are introduced
+            2. All affected tests pass with the updated page object locators
+            3. No unintended side effects are introduced in page object interactions
             
             ### 📋 Files Changed
+            Only page object files in `SRC/pages/` directory are included in this PR.
             Check the "Files changed" tab to see all locator modifications.
             
             ---
             *🤖 This PR was automatically created by AutoHeal based on AI analysis of test failures.*
-          token: ${{ secrets.GITHUB_TOKEN }}
           labels: |
             autoheal
             locator-fix
             ai-suggested
             needs-testing
+          assignees: ${{ github.actor }}
+          draft: false
           delete-branch: true
+          add-paths: |
+            SRC/pages/*.py
 
       - name: Upload AutoHeal Debug Files
         if: always() && env.TEST_FAILED == '1'
