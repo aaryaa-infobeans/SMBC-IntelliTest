@@ -6,7 +6,7 @@ This utility provides AI-powered element location healing when standard locators
 import json
 import os
 import time
-from typing import Dict, Any, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from openai import AzureOpenAI
 from playwright.sync_api import Error as PlaywrightError
@@ -163,7 +163,7 @@ class AutoHealer:
     def _find_locator_source(self, locator: str) -> Tuple[Optional[str], Optional[int]]:
         """Find the source file and line number where the locator is defined."""
         import inspect
-        
+
         # First, search codebase for actual locator definition
         locator_file = self._find_locator_definition_file(locator)
         if locator_file:
@@ -334,8 +334,8 @@ class AutoHealer:
     def _save_to_fallback_file(self, failure_record: Dict[str, Any], reports_dir: str):
         """Save to fallback file when main save fails."""
         try:
-            import time
             import json
+            import time
             
             fallback_file = f"{reports_dir}/captured_failures_backup_{int(time.time())}.json"
             with open(fallback_file, "w", encoding="utf-8") as f:
