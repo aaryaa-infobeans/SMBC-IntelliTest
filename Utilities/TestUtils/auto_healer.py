@@ -3,6 +3,7 @@ Auto Healer Utility for Playwright Test Automation
 This utility provides AI-powered element location healing when standard locators fail.
 """
 
+import json
 import os
 import time
 from typing import Any, Dict, Optional
@@ -53,6 +54,10 @@ class AutoHealer:
         self.last_dom_snapshot = ""
         self.healing_attempts = 0
         self.max_healing_attempts = 3
+        
+        # Check if we're in GitHub Actions and should capture suggestions instead of healing
+        self.capture_mode = os.getenv("GITHUB_ACTIONS") == "true"
+        self.captured_failures = []
 
     def getElement(self, locator: str, description: str = "element") -> Optional[Locator]:
         """
@@ -84,8 +89,13 @@ class AutoHealer:
                 return element
             else:
                 logger.warning(f"Element not found with locator: {locator}")
-                # Directly call AI healing instead of raising exception
-                return self._attempt_ai_healing(locator, description, f"Element not found: {locator}")
+                
+                # In GitHub Actions, capture failure instead of healing
+                if self.capture_mode:
+                    return self._capture_locator_failure(locator, description, f"Element not found: {locator}")
+                else:
+                    # Normal healing mode for local development
+                    return self._attempt_ai_healing(locator, description, f"Element not found: {locator}")
 
         except PlaywrightError as e:
             error_message = str(e)
@@ -99,16 +109,125 @@ class AutoHealer:
             # Handle element not found error
             elif "not found" in error_message.lower() or "timeout" in error_message.lower():
                 logger.warning(f"Element not found, attempting AI healing for: {description}")
-                return self._attempt_ai_healing(locator, description, error_message)
+                if self.capture_mode:
+                    return self._capture_locator_failure(locator, description, error_message)
+                else:
+                    return self._attempt_ai_healing(locator, description, error_message)
 
             else:
                 # Other Playwright errors
                 logger.error(f"Unhandled Playwright error: {error_message}")
-                return self._attempt_ai_healing(locator, description, error_message)
+                if self.capture_mode:
+                    return self._capture_locator_failure(locator, description, error_message)
+                else:
+                    return self._attempt_ai_healing(locator, description, error_message)
 
         except Exception as e:
             logger.error(f"Unexpected error occurred: {str(e)}")
-            return self._attempt_ai_healing(locator, description, str(e))
+            if self.capture_mode:
+                return self._capture_locator_failure(locator, description, str(e))
+            else:
+                return self._attempt_ai_healing(locator, description, str(e))
+
+    def _capture_locator_failure(self, locator: str, description: str, error_message: str) -> Optional[Locator]:
+        """
+        Capture locator failure for later PR creation instead of healing during test execution.
+        
+        Args:
+            locator: The failing locator
+            description: Description of the element  
+            error_message: The error that occurred
+            
+        Returns:
+            None (let the test fail naturally)
+        """
+        import traceback
+        import inspect
+        
+        try:
+            # Get the calling test file and line number from stack trace
+            stack = inspect.stack()
+            test_file = None
+            test_line = None
+            
+            # Look for test file in the stack (usually has 'test_' in the name)
+            for frame_info in stack:
+                if 'test_' in frame_info.filename and frame_info.filename.endswith('.py'):
+                    test_file = frame_info.filename
+                    test_line = frame_info.lineno
+                    break
+            
+            # Get AI suggested locator
+            ai_suggestion = self._get_ai_suggestion_for_capture(locator, description, error_message)
+            
+            # Create failure record
+            failure_record = {
+                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                "test_file": test_file,
+                "line_number": test_line,
+                "failing_locator": locator,
+                "element_description": description,
+                "error_message": error_message,
+                "suggested_locator": ai_suggestion,
+                "page_url": self.page.url if self.page else "unknown",
+                "page_title": self.page.title() if self.page else "unknown"
+            }
+            
+            self.captured_failures.append(failure_record)
+            
+            # Save to file for autoheal_agent to pick up
+            self._save_captured_failure(failure_record)
+            
+            logger.warning(f"🎯 Captured locator failure for PR creation: {locator} -> {ai_suggestion}")
+            
+        except Exception as e:
+            logger.error(f"Error capturing locator failure: {str(e)}")
+        
+        # Return None to let the test fail naturally
+        return None
+    
+    def _get_ai_suggestion_for_capture(self, locator: str, description: str, error_message: str) -> Optional[str]:
+        """Get AI suggestion for the failing locator (for capture mode)."""
+        try:
+            page_context = self._get_page_context()
+            ai_prompt = self._build_locator_healing_prompt(locator, description, error_message, page_context)
+            return self._get_command_from_ai(ai_prompt, "alternative_locator")
+        except Exception as e:
+            logger.error(f"Error getting AI suggestion for capture: {str(e)}")
+            return None
+    
+    def _save_captured_failure(self, failure_record: Dict[str, Any]):
+        """Save captured failure to file for autoheal_agent to process."""
+        try:
+            # Ensure reports directory exists
+            reports_dir = "reports"
+            if not os.path.exists(reports_dir):
+                os.makedirs(reports_dir)
+            
+            # Save to JSON file
+            failures_file = f"{reports_dir}/captured_locator_failures.json"
+            
+            # Load existing failures or create new list
+            existing_failures = []
+            if os.path.exists(failures_file):
+                try:
+                    with open(failures_file, 'r', encoding='utf-8') as f:
+                        existing_failures = json.load(f)
+                except:
+                    existing_failures = []
+            
+            # Add new failure
+            existing_failures.append(failure_record)
+            
+            # Save back to file
+            with open(failures_file, 'w', encoding='utf-8') as f:
+                import json
+                json.dump(existing_failures, f, indent=2, ensure_ascii=False)
+                
+            logger.info(f"Saved captured failure to {failures_file}")
+            
+        except Exception as e:
+            logger.error(f"Error saving captured failure: {str(e)}")
 
     def _handle_strict_mode_error(
         self, original_locator: str, description: str, error_message: str

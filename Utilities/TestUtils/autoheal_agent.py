@@ -1,9 +1,14 @@
 import json
 import os
+import re
 import subprocess
+from typing import Dict, List, Optional, Tuple
 
 from github import Github
 from openai import AzureOpenAI
+
+# Import our existing AutoHealer for AI locator suggestions
+from .auto_healer import AutoHealer
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -11,7 +16,7 @@ AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-3.5-turbo")
 REPO_NAME = os.getenv("GITHUB_REPOSITORY")
 BASE_BRANCH = os.getenv("GITHUB_REF_NAME", "main")
-BRANCH_PREFIX = "autoheal/"
+BRANCH_PREFIX = "autoheal/locator-fix"
 
 
 # Initialize Azure OpenAI client with validation
@@ -36,435 +41,460 @@ def get_openai_client():
 client = get_openai_client()
 
 
-def ai_autoheal_failure(test_name, failure_log, dom_snapshot=""):
-    prompt = f"""
-    Test case: {test_name}
-    Failure log: {failure_log}
-    DOM snapshot (truncated): {dom_snapshot}
-
-    Analyze the test failure and suggest a fix. Return ONLY a valid JSON object with these exact fields:
-    {{
-        "issue_type": "locator_issue|timing_issue|data_issue|other",
-        "confidence": 0.0-1.0,
-        "explanation": "Brief description of the issue and fix",
-        "patch": "Valid unified diff patch or empty string if no code change needed"
-    }}
+class LocatorFailure:
+    """Represents a locator failure extracted from test results."""
     
-    Important: 
-    - Return ONLY valid JSON, no markdown or extra text
-    - Ensure patch is a proper unified diff format if provided
-    - Set confidence between 0.0 and 1.0
-    """
-    # Check if client is available
-    if not client:
-        print("❌ Azure OpenAI client not available")
-        return {
-            "issue_type": "client_error",
-            "confidence": 0.0,
-            "explanation": "Azure OpenAI client not properly initialized",
-            "patch": "",
-        }
+    def __init__(self, test_name: str, file_path: str, line_number: int, 
+                 failing_locator: str, error_message: str, element_description: str = ""):
+        self.test_name = test_name
+        self.file_path = file_path
+        self.line_number = line_number
+        self.failing_locator = failing_locator
+        self.error_message = error_message
+        self.element_description = element_description
+        self.suggested_locator: Optional[str] = None
 
+
+def parse_locator_failures_from_test_results(test_data: dict) -> List[LocatorFailure]:
+    """
+    Parse test failure logs to extract failing locators and their locations.
+    
+    Returns:
+        List of LocatorFailure objects containing failing locator info
+    """
+    failures = []
+    
+    # Handle pytest-json-report format
+    if "tests" in test_data:
+        failed_tests = [test for test in test_data["tests"] if test.get("outcome") == "failed"]
+    else:
+        return failures
+    
+    for test in failed_tests:
+        test_name = test.get("nodeid", "unknown_test")
+        failure_log = test.get("longrepr", "") or str(test.get("call", {}).get("longrepr", ""))
+        
+        # Extract locator failures from the error message
+        locator_failures = extract_locator_info_from_error(test_name, failure_log)
+        failures.extend(locator_failures)
+    
+    return failures
+
+
+def extract_locator_info_from_error(test_name: str, error_log: str) -> List[LocatorFailure]:
+    """
+    Extract locator information from test error logs.
+    
+    Patterns to look for:
+    - Playwright locator errors with file/line info
+    - Element not found errors
+    - Timeout waiting for locator errors
+    """
+    failures = []
+    
+    # Common patterns for locator failures
+    locator_patterns = [
+        # Playwright timeout errors: "Locator.click: Timeout 30000ms exceeded."
+        r'Locator\.(click|fill|hover|wait_for).*?Timeout.*?exceeded.*?locator\("([^"]+)"\)',
+        
+        # Element not found errors with locators
+        r'Element.*?not found.*?locator[:\s]+"([^"]+)"',
+        r'could not find element.*?locator[:\s]+"([^"]+)"',
+        
+        # Playwright strict mode violations
+        r'strict mode violation.*?locator\("([^"]+)"\)',
+        
+        # General locator method calls in stack traces
+        r'page\.locator\("([^"]+)"\)',
+        r'\.locator\("([^"]+)"\)'
+    ]
+    
+    # File path and line number patterns from stack traces  
+    file_line_patterns = [
+        r'([A-Za-z]:[^:]+\.py):(\d+):.*',  # Windows paths
+        r'(/[^:]+\.py):(\d+):.*',          # Unix paths  
+        r'File "([^"]+\.py)", line (\d+)',  # Python traceback format
+    ]
+    
+    for pattern in locator_patterns:
+        matches = re.finditer(pattern, error_log, re.MULTILINE | re.IGNORECASE)
+        for match in matches:
+            locator = match.group(-1)  # Last group is usually the locator
+            
+            # Find file path and line number near this match
+            file_path, line_num = find_file_line_in_context(error_log, match.start())
+            
+            if file_path and line_num:
+                # Extract element description if available
+                description = extract_element_description(error_log, locator)
+                
+                failure = LocatorFailure(
+                    test_name=test_name,
+                    file_path=file_path,
+                    line_number=line_num,
+                    failing_locator=locator,
+                    error_message=error_log[:500],  # First 500 chars
+                    element_description=description
+                )
+                failures.append(failure)
+    
+    return failures
+
+
+def find_file_line_in_context(text: str, position: int) -> Tuple[Optional[str], Optional[int]]:
+    """Find file path and line number near a specific position in error text."""
+    
+    # Look in a window around the position
+    start = max(0, position - 500)
+    end = min(len(text), position + 500)
+    context = text[start:end]
+    
+    file_line_patterns = [
+        r'([A-Za-z]:[^:\s]+\.py):(\d+)',  # Windows paths
+        r'(/[^:\s]+\.py):(\d+)',          # Unix paths  
+        r'File "([^"]+\.py)", line (\d+)', # Python traceback format
+    ]
+    
+    for pattern in file_line_patterns:
+        match = re.search(pattern, context)
+        if match:
+            file_path = match.group(1).strip('"')
+            line_num = int(match.group(2))
+            
+            # Filter for test files only
+            if any(test_dir in file_path for test_dir in ['test_', 'tests/', 'SRC/tests']):
+                return file_path, line_num
+    
+    return None, None
+
+
+def extract_element_description(error_log: str, locator: str) -> str:
+    """Extract element description from error context."""
+    
+    # Look for common description patterns near the locator
+    description_patterns = [
+        rf'# ([^\\n]+).*?{re.escape(locator)}',  # Comments above locator
+        rf'{re.escape(locator)}.*?# ([^\\n]+)',  # Comments after locator  
+        rf'get.*?element.*?"([^"]+)".*?{re.escape(locator)}',  # get_element calls
+        rf'{re.escape(locator)}.*?element.*?"([^"]+)"',
+    ]
+    
+    for pattern in description_patterns:
+        match = re.search(pattern, error_log, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+    
+    return "element"
+
+
+def get_ai_suggested_locator(failure: LocatorFailure) -> Optional[str]:
+    """
+    Use AutoHealer AI functionality to get a suggested replacement locator.
+    
+    This leverages the existing auto_healer.py logic but in a simulated context
+    since we don't have an actual Page object during post-test analysis.
+    """
+    print(f"🤖 Getting AI suggestion for locator: {failure.failing_locator}")
+    
     try:
-        response = client.chat.completions.create(
+        # Create a mock page context for the AI prompt
+        page_context = {
+            "url": "test-page",
+            "title": "Test Page", 
+            "test_name": failure.test_name,
+            "file_path": failure.file_path,
+            "line_number": failure.line_number
+        }
+        
+        # Use the same prompt engineering from auto_healer.py
+        system_prompt = """You are an expert QA automation engineer using Playwright. Your task is to analyze the failed locator and suggest a better CSS selector or XPath that can be used with page.locator().
+
+**CRITICAL RULES**:
+1. **Be Precise**: Your selectors MUST target exactly one element.
+2. **Return CSS Selectors or XPath**: Only return selectors that work with page.locator(), NOT getByRole() or other Playwright methods.
+
+**PREFERRED LOCATOR STRATEGIES** (in order of preference):
+1. **Test IDs and Data Attributes** (most reliable):
+   - `[data-testid='submit-btn']`
+   - `[data-test='login-button']`
+
+2. **Semantic HTML attributes**:
+   - `[aria-label='Submit form']`
+   - `input[placeholder='Enter username']`
+
+3. **ID and Name attributes**:
+   - `#submit-button`
+   - `input[name='username']`
+
+**OUTPUT**: Return ONLY a CSS selector or XPath string that works with page.locator()."""
+        
+        ai_prompt = f"""{system_prompt}
+
+**HEALING CONTEXT**:
+- Failed locator: '{failure.failing_locator}'
+- Element description: '{failure.element_description}'
+- Error: {failure.error_message}
+- Test: {failure.test_name}
+- File: {failure.file_path}:{failure.line_number}
+
+**TASK**: Suggest a better, more robust CSS selector or XPath for the '{failure.element_description}' element.
+
+**OUTPUT**: Return ONLY a CSS selector or XPath string."""
+        
+        # Use the OpenAI client (prefer local client, fallback to auto_healer client)
+        ai_client = client
+        if not ai_client:
+            print("⚠️ Local OpenAI client not available, trying auto_healer client...")
+            from .auto_healer import get_client
+            ai_client = get_client()
+        
+        if not ai_client:
+            print("❌ No OpenAI client available")
+            return None
+        
+        response = ai_client.chat.completions.create(
             model=AZURE_OPENAI_DEPLOYMENT,
             messages=[
-                {
-                    "role": "system",
-                    "content": "You are a QA automation repair assistant. Always respond with valid JSON.",
-                },
-                {"role": "user", "content": prompt},
+                {"role": "system", "content": "You are a Playwright automation expert. Provide only locator strings, no explanations."},
+                {"role": "user", "content": ai_prompt},
             ],
-            max_tokens=1000,
+            max_tokens=100,
             temperature=0.1,
         )
-        content = response.choices[0].message.content
-        # Try to parse JSON, handle cases where response might not be pure JSON
-        try:
-            # First try to parse as direct JSON
-            return json.loads(content)
-        except json.JSONDecodeError as e:
-            print(f"❌ JSON parsing error: {str(e)}")
-            print(f"Raw response: {content[:500]}...")
-            
-            # Extract JSON if it's embedded in markdown or other text
-            import re
-
-            # Try to find JSON blocks in markdown
-            json_patterns = [
-                r'```json\s*({.*?})\s*```',
-                r'```\s*({.*?})\s*```', 
-                r'({\s*".*?})',
-                r'\{[^{}]*\{[^{}]*\}[^{}]*\}',  # Nested objects
-                r'\{[^{}]*\}'  # Simple objects
-            ]
-            
-            for pattern in json_patterns:
-                json_match = re.search(pattern, content, re.DOTALL)
-                if json_match:
-                    try:
-                        return json.loads(json_match.group(1))
-                    except (json.JSONDecodeError, IndexError):
-                        continue
-            
-            # Fallback response if no valid JSON found
-            return {
-                "issue_type": "parsing_error",
-                "confidence": 0.0,
-                "explanation": f"Could not parse AI response. Error: {str(e)}",
-                "patch": "",
-            }
+        
+        suggested_locator = response.choices[0].message.content.strip()
+        
+        # Clean up the response (remove quotes, extra text)
+        suggested_locator = suggested_locator.strip('"\'`')
+        
+        print(f"✅ AI suggested locator: {suggested_locator}")
+        return suggested_locator
+        
     except Exception as e:
-        print(f"❌ Error calling OpenAI API: {str(e)}")
-        return {"issue_type": "api_error", "confidence": 0.0, "explanation": f"API error: {str(e)}", "patch": ""}
-
-
-def apply_patch_and_pr(test_name, patch, explanation, confidence):
-    """Apply patch and create PR with error handling."""
-    if not patch or not patch.strip():
-        print(f"❌ Empty patch for {test_name}, skipping PR creation")
+        print(f"❌ Error getting AI suggestion: {str(e)}")
         return None
 
+
+def create_locator_fix_patch(failure: LocatorFailure, new_locator: str) -> str:
+    """
+    Create a targeted patch that replaces the old locator with the new one
+    at the specific file location.
+    """
     try:
-        # Validate required environment variables
-        if not GITHUB_TOKEN:
-            print("❌ GITHUB_TOKEN not found in environment")
+        # Read the target file
+        with open(failure.file_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+        
+        if failure.line_number > len(lines):
+            print(f"❌ Line number {failure.line_number} exceeds file length")
+            return ""
+        
+        # Find and replace the locator on the specific line
+        line_index = failure.line_number - 1  # Convert to 0-based index
+        original_line = lines[line_index]
+        
+        # Create modified line with new locator
+        modified_line = original_line.replace(f'"{failure.failing_locator}"', f'"{new_locator}"')
+        
+        # If double quotes didn't work, try single quotes
+        if modified_line == original_line:
+            modified_line = original_line.replace(f"'{failure.failing_locator}'", f"'{new_locator}'")
+        
+        if modified_line == original_line:
+            print(f"❌ Could not find locator '{failure.failing_locator}' on line {failure.line_number}")
+            return ""
+        
+        # Create unified diff patch
+        patch = f"""--- a/{failure.file_path}
++++ b/{failure.file_path}
+@@ -{failure.line_number},1 +{failure.line_number},1 @@
+-{original_line.rstrip()}
++{modified_line.rstrip()}
+"""
+        
+        return patch
+        
+    except Exception as e:
+        print(f"❌ Error creating patch: {str(e)}")
+        return ""
+
+
+def apply_locator_fix_and_create_pr(failure: LocatorFailure) -> Optional[str]:
+    """
+    Apply the locator fix and create a PR for the specific locator replacement.
+    """
+    if not failure.suggested_locator:
+        print(f"❌ No suggested locator available for {failure.test_name}")
+        return None
+    
+    try:
+        # Validate environment
+        if not GITHUB_TOKEN or not REPO_NAME:
+            print("❌ GitHub configuration not available")
             return None
-        if not REPO_NAME:
-            print("❌ GITHUB_REPOSITORY not found in environment")
+        
+        # Create branch name
+        safe_test_name = failure.test_name.replace('/', '_').replace('::', '_')
+        branch_name = f"{BRANCH_PREFIX}_{safe_test_name}_{os.urandom(4).hex()}"
+        
+        # Create patch
+        patch = create_locator_fix_patch(failure, failure.suggested_locator)
+        if not patch:
             return None
-
-        branch_name = f"{BRANCH_PREFIX}{test_name.replace('/', '_').replace('::', '_')}_{os.urandom(4).hex()}"
-        patch_file = "autoheal.patch"
-
-        # Write patch with proper formatting
-        with open(patch_file, "w", encoding="utf-8") as f:
-            # Ensure patch has proper headers if missing
-            if not patch.startswith("diff ") and not patch.startswith("--- "):
-                # Try to format as a basic patch if it looks like a simple replacement
-                if "@@" not in patch:
-                    print(f"⚠️ Patch doesn't appear to be in unified diff format for {test_name}")
-                    print(f"Raw patch content: {patch[:200]}...")
-                    return None
-            f.write(patch)
-
-        # Validate patch format first
-        result = subprocess.run(["git", "apply", "--check", "--ignore-whitespace", patch_file], 
-                              capture_output=True, text=True, check=False)
-        if result.returncode != 0:
-            print(f"❌ Patch validation failed for {test_name}: {result.stderr}")
-            # Try with different options
-            result = subprocess.run(["git", "apply", "--check", "--ignore-space-change", "--ignore-whitespace", patch_file], 
-                                  capture_output=True, text=True, check=False)
-            if result.returncode != 0:
-                print(f"❌ Patch validation failed with relaxed options: {result.stderr}")
-                return None
-
-        # Create branch first, then apply patch
-        subprocess.run(["git", "checkout", "-b", branch_name], check=True)
         
         # Apply patch
-        result = subprocess.run(["git", "apply", "--ignore-whitespace", patch_file], 
-                              capture_output=True, text=True, check=False)
-        if result.returncode != 0:
-            print(f"❌ Failed to apply patch: {result.stderr}")
-            # Try to rollback
-            subprocess.run(["git", "checkout", BASE_BRANCH], check=False)
-            subprocess.run(["git", "branch", "-D", branch_name], check=False)
-            return None
+        patch_file = "locator_fix.patch"
+        with open(patch_file, "w", encoding="utf-8") as f:
+            f.write(patch)
+        
+        # Git operations
+        subprocess.run(["git", "checkout", "-b", branch_name], check=True)
+        subprocess.run(["git", "apply", patch_file], check=True)
+        subprocess.run(["git", "add", failure.file_path], check=True)
+        
+        commit_msg = f"""🔧 AutoHeal: Fix locator in {failure.test_name}
 
-        # Check if there are any changes to commit
-        status_result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
-        if not status_result.stdout.strip():
-            print(f"⚠️ No changes detected after applying patch for {test_name}")
-            subprocess.run(["git", "checkout", BASE_BRANCH], check=False)
-            subprocess.run(["git", "branch", "-D", branch_name], check=False)
-            return None
+Location: {failure.file_path}:{failure.line_number}
+Old locator: {failure.failing_locator}
+New locator: {failure.suggested_locator}
+Element: {failure.element_description}"""
 
-        subprocess.run(["git", "add", "."], check=True)
-        subprocess.run(
-            ["git", "commit", "-m", f"🔧 AutoHeal: Fix for {test_name}\n\nConfidence: {confidence}\n{explanation}"],
-            check=True,
-        )
+        subprocess.run(["git", "commit", "-m", commit_msg], check=True)
         subprocess.run(["git", "push", "origin", branch_name], check=True)
-
+        
         # Create PR
         gh = Github(GITHUB_TOKEN)
         repo = gh.get_repo(REPO_NAME)
+        
+        pr_body = f"""## 🔧 AutoHeal Locator Fix
 
-        pr_body = f"""## 🤖 AutoHeal Fix
+**Test:** `{failure.test_name}`  
+**File:** `{failure.file_path}:{failure.line_number}`  
+**Element:** {failure.element_description}
 
-**Test Case:** `{test_name}`
-**Confidence:** {confidence:.2f}
-
-### 📝 Explanation
-{explanation}
-
-### 🔧 Changes Applied
+### 🔄 Locator Change
 ```diff
-{patch}
+- "{failure.failing_locator}"
++ "{failure.suggested_locator}"
 ```
 
----
-*This PR was automatically created by AutoHeal based on test failure analysis.*
-"""
+### 📋 Details
+- **Original Error:** {failure.error_message[:200]}...
+- **AI Confidence:** High (AI-suggested replacement)
+- **Impact:** Single locator replacement at specific line
 
+### 🧪 Testing Required
+Please verify this locator works correctly in the test environment before merging.
+
+---
+*🤖 This PR was automatically created by AutoHeal based on AI analysis of test failures.*
+"""
+        
         pr = repo.create_pull(
-            title=f"🔧 AutoHeal: Fix for {test_name}",
+            title=f"🔧 Fix locator in {failure.test_name}",
             body=pr_body,
             head=branch_name,
             base=BASE_BRANCH,
         )
-
+        
         # Add labels
         try:
-            pr.add_to_labels("autoheal", "automated-fix", "needs-review")
+            pr.add_to_labels("autoheal", "locator-fix", "ai-suggested", "needs-testing")
         except Exception as e:
-            print(f"⚠️ Could not add labels to PR: {e}")
-
-        print(f"✅ AutoHeal PR created for {test_name}: {pr.html_url}")
+            print(f"⚠️ Could not add labels: {e}")
+        
+        print(f"✅ Locator fix PR created: {pr.html_url}")
         return pr.html_url
-
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Git operation failed for {test_name}: {e}")
-        # Cleanup failed branch
-        subprocess.run(["git", "checkout", BASE_BRANCH], check=False)
-        subprocess.run(["git", "branch", "-D", branch_name], check=False)
-        return None
+        
     except Exception as e:
-        print(f"❌ Failed to create PR for {test_name}: {e}")
+        print(f"❌ Failed to create locator fix PR: {str(e)}")
         return None
     finally:
         # Cleanup
-        if os.path.exists("autoheal.patch"):
-            os.remove("autoheal.patch")
+        if os.path.exists("locator_fix.patch"):
+            os.remove("locator_fix.patch")
 
 
-def create_manual_review_pr(test_name, failure_log, patch_content):
-    """Create a PR for manual review when AI is not available."""
-    branch_name = None
-    review_file = None
-    try:
-        # Validate required environment variables
-        if not GITHUB_TOKEN or not REPO_NAME:
-            print("❌ GitHub configuration not available for manual PR creation")
-            return None
-
-        branch_name = (
-            f"{BRANCH_PREFIX}manual-review_{test_name.replace('/', '_').replace('::', '_')}_{os.urandom(4).hex()}"
-        )
-
-        # Create manual review file
-        review_file = f"MANUAL_REVIEW_{test_name.replace('/', '_').replace('::', '_')}.md"
-        with open(review_file, "w", encoding="utf-8") as f:
-            f.write(patch_content)
-
-        # Git operations with better error handling
-        subprocess.run(["git", "checkout", "-b", branch_name], check=True)
-        subprocess.run(["git", "add", review_file], check=True)
-        
-        # Check if there are changes to commit
-        status_result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
-        if not status_result.stdout.strip():
-            print(f"⚠️ No changes to commit for manual review of {test_name}")
-            return None
-            
-        subprocess.run(
-            ["git", "commit", "-m", f"📋 Manual Review: {test_name}\n\nTest failure requires manual investigation"],
-            check=True,
-        )
-        subprocess.run(["git", "push", "origin", branch_name], check=True)
-
-        # Create PR
-        gh = Github(GITHUB_TOKEN)
-        repo = gh.get_repo(REPO_NAME)
-
-        pr_body = f"""## 📋 Manual Review Required
-
-**Test Case:** `{test_name}`
-**Status:** Failed - AI AutoHeal not available
-
-### 🔍 Failure Details
-```
-{failure_log[:1500]}
-```
-
-### 🛠️ Action Required
-1. **Investigate** the test failure manually
-2. **Check** if locators need updating
-3. **Verify** test logic and data
-4. **Apply** necessary fixes
-5. **Close** this PR after resolution
-
-### 📝 Notes
-- AutoHeal AI was not available during execution
-- This PR is for tracking and manual investigation
-- The failure may be due to locator changes, test data issues, or application changes
-
----
-*This PR was created automatically for manual investigation of test failures.*
-"""
-
-        pr = repo.create_pull(
-            title=f"📋 Manual Review: {test_name}",
-            body=pr_body,
-            head=branch_name,
-            base=BASE_BRANCH,
-        )
-
-        # Add labels
-        try:
-            pr.add_to_labels("manual-review", "test-failure", "needs-investigation")
-        except Exception as e:
-            print(f"⚠️ Could not add labels to manual review PR: {e}")
-
-        return pr.html_url
-
-    except Exception as e:
-        print(f"❌ Failed to create manual review PR for {test_name}: {e}")
-        # Cleanup on failure
-        if branch_name:
-            subprocess.run(["git", "checkout", BASE_BRANCH], check=False)
-            subprocess.run(["git", "branch", "-D", branch_name], check=False)
-        return None
-    finally:
-        # Clean up review file
-        if review_file and os.path.exists(review_file):
-            os.remove(review_file)
+# Note: Manual review PR functionality removed as we now focus on targeted locator fixes
 
 
 def process_failures():
-    """Process test failures and create AutoHeal PRs."""
+    """Process captured locator failures and create targeted PR fixes."""
 
-    # Check for test results file (pytest-json-report format)
-    test_files = ["test-results.json", "failures.json", ".pytest_cache/failures.json"]
-    test_file = None
-
-    for file_path in test_files:
-        if os.path.exists(file_path):
-            test_file = file_path
-            break
-
-    if not test_file:
-        print("❌ No test results file found. Checked:", ", ".join(test_files))
+    # Check for captured failures file (created by auto_healer.py during test execution)
+    captured_failures_file = "reports/captured_locator_failures.json"
+    
+    if not os.path.exists(captured_failures_file):
+        print(f"❌ No captured locator failures found at: {captured_failures_file}")
+        print("ℹ️  This file is created by auto_healer.py when running in GitHub Actions")
         return
 
-    print(f"📖 Reading test results from: {test_file}")
+    print(f"📖 Reading captured locator failures from: {captured_failures_file}")
 
     try:
-        with open(test_file) as f:
-            test_data = json.load(f)
+        with open(captured_failures_file) as f:
+            captured_failures = json.load(f)
     except json.JSONDecodeError as e:
-        print(f"❌ Error parsing {test_file}: {e}")
+        print(f"❌ Error parsing {captured_failures_file}: {e}")
         return
     except Exception as e:
-        print(f"❌ Error reading {test_file}: {e}")
+        print(f"❌ Error reading {captured_failures_file}: {e}")
         return
 
-    # Handle different JSON formats
-    failed_tests = []
-
-    # pytest-json-report format
-    if "tests" in test_data:
-        failed_tests = [test for test in test_data["tests"] if test.get("outcome") == "failed"]
-    # Custom failures.json format
-    elif "tests" in test_data:
-        failed_tests = test_data.get("tests", [])
-    else:
-        print("❌ Unrecognized test results format")
+    if not captured_failures:
+        print("✅ No captured locator failures found. Nothing to heal.")
         return
 
-    if not failed_tests:
-        print("✅ No failed tests found. Nothing to heal.")
-        return
-
-    print(f"🔍 Found {len(failed_tests)} failed tests to analyze")
+    print(f"🎯 Found {len(captured_failures)} captured locator failures to process")
     healed_count = 0
 
-    for failure in failed_tests:
+    for captured_failure in captured_failures:
         try:
-            # Extract test information
-            test_name = failure.get("nodeid") or failure.get("name", "unknown_test")
-            failure_log = failure.get("longrepr") or failure.get("call", {}).get("longrepr", "No failure details")
-
-            print(f"\n🔧 Processing: {test_name}")
-
-            # Get DOM snapshot if available (from auto_healer reports)
-            dom_snapshot = ""
-            if os.path.exists("reports"):
-                # Look for DOM snapshots related to this test
-                import glob
-
-                snapshots = glob.glob(f"reports/dom_snapshot_*_{test_name.replace('::', '_')}*.html")
-                if snapshots:
-                    try:
-                        with open(snapshots[0], "r", encoding="utf-8") as f:
-                            dom_snapshot = f.read()[:2000]  # Truncate for API
-                    except Exception:
-                        pass
-
-            # Get AI healing suggestion
-            healing = ai_autoheal_failure(test_name, failure_log, dom_snapshot)
+            # Convert captured failure to LocatorFailure object
+            failure = LocatorFailure(
+                test_name=f"captured_from_{os.path.basename(captured_failure.get('test_file', 'unknown'))}",
+                file_path=captured_failure.get('test_file', ''),
+                line_number=captured_failure.get('line_number', 0),
+                failing_locator=captured_failure.get('failing_locator', ''),
+                error_message=captured_failure.get('error_message', ''),
+                element_description=captured_failure.get('element_description', 'element')
+            )
             
-            # Handle different confidence levels and error types
-            confidence = healing.get("confidence", 0)
-            issue_type = healing.get("issue_type", "unknown")
-            patch = healing.get("patch", "")
+            # Use the already-captured AI suggestion
+            failure.suggested_locator = captured_failure.get('suggested_locator')
             
-            # Validate confidence is a number
-            try:
-                confidence = float(confidence)
-            except (ValueError, TypeError):
-                print(f"⚠️ Invalid confidence value for {test_name}: {confidence}")
-                confidence = 0.0
+            print(f"\n🔧 Processing captured locator failure:")
+            print(f"   📁 File: {failure.file_path}:{failure.line_number}")
+            print(f"   🎯 Failed Locator: {failure.failing_locator}")
+            print(f"   💡 AI Suggested: {failure.suggested_locator}")
+            print(f"   📝 Element: {failure.element_description}")
 
-            if confidence >= 0.7 and patch and patch.strip():
-                print(f"✅ High confidence fix found (confidence: {confidence:.2f})")
-                pr_url = apply_patch_and_pr(test_name, patch, healing["explanation"], confidence)
+            if failure.suggested_locator:
+                # Create PR with targeted locator fix
+                pr_url = apply_locator_fix_and_create_pr(failure)
+                
                 if pr_url:
                     healed_count += 1
-                    print(f"✨ AutoHeal PR created: {pr_url}")
-            elif issue_type in ["client_error", "api_error", "parsing_error"]:
-                print(f"⚠️ AI issue detected ({issue_type}) - creating manual review PR for {test_name}")
-                # Create a PR with failure information for manual review
-                manual_patch = f"""# Manual Review Required for Test: {test_name}
-
-## Issue Type: {issue_type}
-
-## Test Failure Details:
-```
-{failure_log[:1000]}
-```
-
-## AutoHeal Analysis:
-- **Confidence:** {confidence}
-- **Explanation:** {healing.get('explanation', 'No explanation provided')}
-- **Issue:** {issue_type}
-
-## Manual Investigation Steps:
-1. Review the test failure details above
-2. Check if locators need updating
-3. Verify test data and logic
-4. Apply necessary fixes manually
-5. Close this PR after resolution
-
-## Notes:
-- AutoHeal AI encountered an issue during analysis
-- This requires human investigation and resolution
-"""
-                manual_pr_url = create_manual_review_pr(test_name, failure_log, manual_patch)
-                if manual_pr_url:
-                    print(f"📋 Manual review PR created: {manual_pr_url}")
+                    print(f"✅ Locator fix PR created: {pr_url}")
+                else:
+                    print(f"❌ Failed to create PR for {failure.file_path}")
             else:
-                print(f"⚠️ Skipping {test_name} (confidence: {confidence:.2f}, patch: {'present' if patch else 'empty'})")
+                print(f"⚠️ No AI suggestion available - skipping")
 
         except Exception as e:
-            print(f"❌ Error processing {test_name}: {str(e)}")
+            print(f"❌ Error processing captured failure: {str(e)}")
             import traceback
             print(f"Detailed error: {traceback.format_exc()}")
             continue
 
-    print(f"\n🎉 AutoHeal Summary: Created {healed_count} PR(s) out of {len(failed_tests)} failed tests")
+    print(f"\n🎉 AutoHeal Summary: Created {healed_count} locator fix PR(s) out of {len(captured_failures)} captured failures")
+    
+    # Clean up the captured failures file after processing
+    try:
+        os.remove(captured_failures_file)
+        print(f"🧹 Cleaned up {captured_failures_file}")
+    except Exception as e:
+        print(f"⚠️ Could not clean up captured failures file: {e}")
 
 
 if __name__ == "__main__":
