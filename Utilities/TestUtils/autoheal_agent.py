@@ -2,8 +2,8 @@ import json
 import os
 import subprocess
 
-from openai import AzureOpenAI
 from github import Github
+from openai import AzureOpenAI
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -89,7 +89,7 @@ def ai_autoheal_failure(test_name, failure_log, dom_snapshot=""):
             
             # Extract JSON if it's embedded in markdown or other text
             import re
-            
+
             # Try to find JSON blocks in markdown
             json_patterns = [
                 r'```json\s*({.*?})\s*```',
