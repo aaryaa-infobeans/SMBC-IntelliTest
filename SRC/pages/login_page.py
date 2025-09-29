@@ -13,7 +13,7 @@ class LoginPage(BasePage):
     __loc_password_input = "input[type='password']"  # nosec - This is a CSS selector, not a real password
     __loc_login_button = "#login-button"
     __loc_error_message = "//h3[text()]"
-    __loc_logout_button = '//*[contains(text(), "Lgout")]'
+    __loc_logout_button = '//button[contains(text(), 'Logout')]'
 
     def __init__(self, page: Page):
         super().__init__(page)
