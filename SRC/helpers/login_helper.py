@@ -12,7 +12,7 @@ class LoginHelper:
         self.login_page = LoginPage(page)
 
     @log_step("Performing Login with username and password")
-    def login(self, username: str, password: str, use_password_locator: bool = False):
+    def login(self, username: str, password: str):
         """
         Login to the application with given username and password
         :param username: The username to be used for login.
@@ -21,10 +21,7 @@ class LoginHelper:
         logger.info(f"Logging in with username: {username}")
         self.login_page.enter_username(username)
         logger.info(f"Logging in with password: {password[:3]}...")
-        if use_password_locator:
-            self.login_page.enter_password(password, use_password_locator)
-        else:
-            self.login_page.enter_password(password)
+        self.login_page.enter_password(password)
         logger.info("Clicking login button")
         self.login_page.click_login()
         logger.info("Login completed successfully")

@@ -43,9 +43,7 @@ class TestLogin(TestBase):
         Test logout functionality.
         """
         self.login_helper.login(
-            test_data["login"]["valid_credentials"]["username"],
-            test_data["login"]["valid_credentials"]["password"],
-            True,
+            test_data["login"]["valid_credentials"]["username"], test_data["login"]["valid_credentials"]["password"]
         )
         self.login_helper.logout()
         self.login_helper.verify_logout_success(base_url + "/index.html")
