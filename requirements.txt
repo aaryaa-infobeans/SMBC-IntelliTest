@@ -34,6 +34,7 @@ pathspec==0.12.1
 platformdirs==4.4.0
 playwright==1.55.0
 pluggy==1.6.0
+PyGithub==2.1.1
 pre_commit==4.0.1
 pyee==13.0.0
 pyproject_hooks==1.2.0
