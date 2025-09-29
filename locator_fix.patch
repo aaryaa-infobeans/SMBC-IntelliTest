@@ -1,5 +1,5 @@
 --- a/SRC/pages/login_page.py
 +++ b/SRC/pages/login_page.py
-@@ -16,1 +16,1 @@
--    __loc_logout_button = '//*[contains(text(), "Lgout")]'
-+    __loc_logout_button = '//a[contains(text(), 'Logout')]'
+@@ -12,1 +12,1 @@
+-    __loc_username_input = "#user-name"
++    __loc_username_input = "input[name='user-name']"
