@@ -150,18 +150,29 @@ class AutoHealer:
             test_file = None
             test_line = None
             
-            # Look for the file where the locator is actually defined (pages/ or helpers/)
-            # Priority: pages > helpers > base > tests (to find where locator is defined)
+            # Look for the file where the locator is actually defined
+            # Skip base_page.py and look for actual page objects
             for frame_info in stack:
                 filename = frame_info.filename
                 if filename.endswith('.py'):
-                    # Prioritize page objects and helpers where locators are typically defined
-                    if any(pattern in filename for pattern in ['pages/', 'page.py', 'helpers/', 'helper.py']):
+                    # Skip base classes and prioritize actual page objects
+                    if ('pages/' in filename and 'base_page.py' not in filename) or \
+                       ('page.py' in filename and 'base_page.py' not in filename) or \
+                       ('helpers/' in filename and 'base_' not in filename):
+                        # Additional validation: check if this frame might contain locator definitions
+                        # Look for patterns like assignment statements in the code context
                         test_file = filename
                         test_line = frame_info.lineno
                         break
             
-            # Fallback to test file if no page/helper found
+            # Always try to find the actual locator definition file first
+            locator_file = self._find_locator_definition_file(locator)
+            if locator_file:
+                test_file = locator_file
+                test_line = self._find_locator_line_number(locator_file, locator)
+                logger.info(f"Found locator '{locator}' declared in {test_file}:{test_line}")
+            
+            # Final fallback to test file if nothing else found
             if not test_file:
                 for frame_info in stack:
                     if 'test_' in frame_info.filename and frame_info.filename.endswith('.py'):
@@ -240,6 +251,74 @@ class AutoHealer:
             
         except Exception as e:
             logger.error(f"Error saving captured failure: {str(e)}")
+    
+    def _find_locator_definition_file(self, locator: str) -> Optional[str]:
+        """Find the file where the locator is actually defined by searching the codebase."""
+        try:
+            import glob
+            import os
+
+            # Get the current working directory and build search paths relative to it
+            current_dir = os.getcwd()
+            
+            # Search for Python files in pages and helpers directories
+            search_paths = [
+                os.path.join(current_dir, "SRC", "pages", "*.py"),
+                os.path.join(current_dir, "SRC", "helpers", "*.py"),
+                "SRC/pages/*.py",
+                "SRC/helpers/*.py"
+            ]
+            
+            for pattern in search_paths:
+                for file_path in glob.glob(pattern):
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            lines = f.readlines()
+                            
+                        # Look for locator declarations specifically
+                        for line_num, line in enumerate(lines):
+                            # Look for locator variable declarations specifically
+                            if (locator in line and '=' in line):
+                                # Must be a variable assignment (not a method call or other usage)
+                                # Look for patterns: variable_name = "locator"
+                                equals_pos = line.find('=')
+                                locator_pos = line.find(locator)
+                                
+                                # Ensure = comes before the locator and it's in quotes
+                                if (equals_pos < locator_pos and 
+                                    (f'"{locator}"' in line or f"'{locator}'" in line)):
+                                    
+                                    # Additional validation: look for locator-like variable names
+                                    left_side = line[:equals_pos].strip()
+                                    if (any(pattern in left_side.lower() for pattern in 
+                                           ['loc', '_input', '_button', '_field', '_element', '_selector']) and
+                                        not left_side.startswith(('self.', 'page.', '(', '['))):  # Not method calls
+                                        logger.info(f"Found locator '{locator}' declared in: {file_path} at line {line_num + 1}")
+                                        return file_path
+                                    
+                    except Exception as e:
+                        logger.debug(f"Error reading file {file_path}: {e}")
+                        continue
+                        
+        except Exception as e:
+            logger.error(f"Error searching for locator definition: {str(e)}")
+        
+        return None
+    
+    def _find_locator_line_number(self, file_path: str, locator: str) -> Optional[int]:
+        """Find the line number where the locator is defined in the given file."""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                
+            for i, line in enumerate(lines):
+                if locator in line and ('=' in line or '__loc' in line):
+                    return i + 1  # Convert to 1-based line number
+                    
+        except Exception as e:
+            logger.error(f"Error finding line number for locator: {str(e)}")
+        
+        return 1  # Default to line 1 if not found
 
     def _handle_strict_mode_error(
         self, original_locator: str, description: str, error_message: str
