@@ -282,6 +282,42 @@ def get_ai_suggested_locator(failure: LocatorFailure) -> Optional[str]:
         return None
 
 
+def attempt_manual_file_edit(failure: LocatorFailure, new_locator: str) -> bool:
+    """
+    Manual file editing as a fallback when patch fails.
+    Directly modifies the file content without using git patch.
+    """
+    try:
+        relative_path = get_relative_path(failure.file_path)
+        file_to_edit = failure.file_path if os.path.exists(failure.file_path) else relative_path
+        
+        with open(file_to_edit, "r", encoding="utf-8") as f:
+            content = f.read()
+        
+        # Simple string replacement approach
+        old_content = content
+        new_content = content.replace(f'"{failure.failing_locator}"', f'"{new_locator}"')
+        
+        # If double quotes didn't work, try single quotes
+        if new_content == old_content:
+            new_content = content.replace(f"'{failure.failing_locator}'", f"'{new_locator}'")
+        
+        if new_content == old_content:
+            print(f"❌ Could not find and replace locator '{failure.failing_locator}' in file")
+            return False
+        
+        # Write back the modified content
+        with open(file_to_edit, "w", encoding="utf-8") as f:
+            f.write(new_content)
+        
+        print(f"✅ Successfully replaced '{failure.failing_locator}' with '{new_locator}'")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Manual edit failed: {str(e)}")
+        return False
+
+
 def get_relative_path(file_path: str) -> str:
     """Convert absolute path to relative path for git operations."""
     if not os.path.isabs(file_path):
@@ -329,20 +365,33 @@ def create_locator_fix_patch(failure: LocatorFailure, new_locator: str) -> str:
             print(f"⚠️  Locator '{failure.failing_locator}' not found on line {failure.line_number}")
             print("🔍 Searching entire file for the locator...")
 
-            # Search for the locator in the entire file
+            # Search for the locator in the entire file using the refined logic
             found_line_index = None
             for i, line in enumerate(lines):
-                if failure.failing_locator in line and ("=" in line or "locator" in line.lower()):
-                    found_line_index = i
-                    original_line = line
-                    modified_line = line.replace(f'"{failure.failing_locator}"', f'"{new_locator}"')
-                    if modified_line == original_line:
-                        modified_line = line.replace(f"'{failure.failing_locator}'", f"'{new_locator}'")
+                # Use same logic as auto_healer.py for consistency
+                if failure.failing_locator in line and "=" in line:
+                    equals_pos = line.find("=")
+                    locator_pos = line.find(failure.failing_locator)
+                    
+                    # Ensure = comes before the locator and it's in quotes
+                    if equals_pos < locator_pos and (f'"{failure.failing_locator}"' in line or f"'{failure.failing_locator}'" in line):
+                        # Additional validation: look for locator-like variable names
+                        left_side = line[:equals_pos].strip()
+                        if any(
+                            pattern in left_side.lower()
+                            for pattern in ["loc", "_input", "_button", "_field", "_element", "_selector"]
+                        ) and not left_side.startswith(("self.", "page.", "(", "[")):
+                            
+                            found_line_index = i
+                            original_line = line
+                            modified_line = line.replace(f'"{failure.failing_locator}"', f'"{new_locator}"')
+                            if modified_line == original_line:
+                                modified_line = line.replace(f"'{failure.failing_locator}'", f"'{new_locator}'")
 
-                    if modified_line != original_line:
-                        print(f"✅ Found locator on line {i + 1}: {line.strip()}")
-                        failure.line_number = i + 1  # Update the line number
-                        break
+                            if modified_line != original_line:
+                                print(f"✅ Found locator on line {i + 1}: {line.strip()}")
+                                failure.line_number = i + 1  # Update the line number
+                                break
 
             if found_line_index is None:
                 print(f"❌ Could not find locator '{failure.failing_locator}' anywhere in the file")
@@ -392,8 +441,23 @@ def apply_locator_fix_and_create_pr(failure: LocatorFailure) -> Optional[str]:
             f.write(patch)
 
         print(f"📄 Created patch file: {patch_file}")
-        print(f"📄 Patch content preview:")
-        print(patch[:200] + "..." if len(patch) > 200 else patch)
+        print(f"📄 Patch content:")
+        print(patch)
+        
+        # Show current file content around the target line for debugging
+        try:
+            with open(get_relative_path(failure.file_path), "r", encoding="utf-8") as f:
+                current_lines = f.readlines()
+                
+            print(f"📋 Current file content around line {failure.line_number}:")
+            start_line = max(0, failure.line_number - 3)
+            end_line = min(len(current_lines), failure.line_number + 2)
+            
+            for i in range(start_line, end_line):
+                marker = ">>> " if i + 1 == failure.line_number else "    "
+                print(f"{marker}{i+1:3}: {current_lines[i].rstrip()}")
+        except Exception as e:
+            print(f"⚠️ Could not read current file content: {e}")
 
         # Git operations
         subprocess.run(["git", "checkout", "-b", branch_name], check=True)
@@ -401,12 +465,29 @@ def apply_locator_fix_and_create_pr(failure: LocatorFailure) -> Optional[str]:
         result = subprocess.run(["git", "apply", patch_file], capture_output=True, text=True)
 
         if result.returncode != 0:
-            print(f"❌ Git apply failed:")
+            print(f"❌ Initial git apply failed, trying with whitespace options...")
             print(f"   stdout: {result.stdout}")
             print(f"   stderr: {result.stderr}")
-            raise subprocess.CalledProcessError(result.returncode, ["git", "apply", patch_file])
-
-        print(f"✅ Patch applied successfully")
+            
+            # Try with whitespace/formatting tolerance
+            result2 = subprocess.run(["git", "apply", "--ignore-space-change", "--ignore-whitespace", patch_file], 
+                                   capture_output=True, text=True)
+            
+            if result2.returncode != 0:
+                print(f"❌ Git apply with whitespace options also failed:")
+                print(f"   stdout: {result2.stdout}")
+                print(f"   stderr: {result2.stderr}")
+                
+                # Last resort: manual file editing
+                print(f"🔧 Attempting manual file edit as fallback...")
+                if attempt_manual_file_edit(failure, failure.suggested_locator):
+                    print(f"✅ Manual edit successful")
+                else:
+                    raise subprocess.CalledProcessError(result.returncode, ["git", "apply", patch_file])
+            else:
+                print(f"✅ Patch applied successfully with whitespace options")
+        else:
+            print(f"✅ Patch applied successfully")
 
         # Use relative path for git add as well
         relative_file_path = get_relative_path(failure.file_path)
