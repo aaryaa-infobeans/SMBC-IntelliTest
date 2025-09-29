@@ -1,8 +1,0 @@
-INFO     TestAutomationFramework:logger.py:84 Session created successfully
-INFO     TestAutomationFramework:logger.py:84 Updating the booking with Booking ID: 2348
-INFO     TestAutomationFramework:logger.py:84 Making PUT request to /booking/2348, with kwargs: {'timeout': 30, 'data': '{"firstname": "James", "lastname": "Brown", "totalprice": 111, "depositpaid": true, "bookingdates": {"checkin": "2018-01-01", "checkout": "2019-01-01"}, "additionalneeds": "Breakfast"}'}
-INFO     TestAutomationFramework:logger.py:84 PUT request made successfully: 200
-INFO     TestAutomationFramework:logger.py:84 Request time taken by __put_request: 0.2603740692138672
-INFO     TestAutomationFramework:logger.py:84 Request made successfully: 200
-INFO     TestAutomationFramework:logger.py:84 Session closed successfully
-INFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0014522075653076172
