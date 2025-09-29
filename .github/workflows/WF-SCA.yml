@@ -1,11 +1,11 @@
 name: WF-Static Code Analysis
 
 on:
-  # pull_request:
-  # push:
-  #   branches:
-  #     - master
-  #     - dev
+  pull_request:
+  push:
+    branches:
+      - master
+      - dev
   workflow_dispatch:
   workflow_call:   # 👈 This makes it reusable in other workflows
 

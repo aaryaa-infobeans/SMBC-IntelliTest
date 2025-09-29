@@ -59,7 +59,7 @@ jobs:
   test-execution:
     # Ensure SCA runs and succeeds first on manual trigger; on other triggers, proceed normally
     needs: run_sca_first_if_manual
-    # Run only when:
+          # Run only when:
     # - Manual trigger and reusable SCA succeeded, OR
     # - Triggered by workflow_run and upstream SCA concluded success.
     # Use always() to avoid auto-skip when 'needs' is skipped on non-manual triggers.
@@ -68,6 +68,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
+      issues: write
+      repository-projects: write
 
     steps:
       - name: Checkout code
@@ -133,7 +136,7 @@ jobs:
             # The message content. Supports HTML up to a certain level (interpreted by MS Teams). Can also be empty.
           message: ${{ env.testExecutionStartedMessage }}
       
-      - name: Execute Tests
+      - name: Execute Tests with custom runner
         continue-on-error: true
         if: ${{ github.event.inputs.mode == 'parallel-with-custom-runner' }}
         env:
@@ -165,7 +168,7 @@ jobs:
 
  
 
-      - name: Execute Tests
+      - name: Execute Tests with pytest
         id: execute_tests  # Add this ID to reference the step
         # run when mode is not parallel-with-custom-runner
         if: ${{ github.event.inputs.mode != 'parallel-with-custom-runner' }}
@@ -234,11 +237,81 @@ jobs:
       - name: Auto-healing (if failed)
         if: env.TEST_FAILED == '1'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
         run: |
           python Utilities/TestUtils/autoheal_agent.py
 
+      - name: Check for AutoHeal changes in SRC/pages
+        if: env.TEST_FAILED == '1'
+        id: check-changes
+        run: |
+          if git diff --quiet -- SRC/pages/; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No files were modified by AutoHeal in SRC/pages/"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Files modified by AutoHeal in SRC/pages/:"
+            git diff --name-only -- SRC/pages/
+          fi
+
+      - name: Create Pull Request for AutoHeal fixes
+        if: env.TEST_FAILED == '1' && steps.check-changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          commit-message: "🔧 AutoHeal: Fix failing test locators"
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          branch: autoheal/locator-fixes-${{ github.run_id }}
+          branch-suffix: short-commit-hash
+          title: "🔧 AutoHeal: Fix page object locators from run #${{ github.run_id }}"
+          body: |
+            ## 🔧 AutoHeal Page Object Locator Fixes
+            
+            This PR contains automated locator fixes for **page objects only** (`SRC/pages/`) detected by the AutoHeal system.
+            
+            ### 🎯 Details
+            - **Trigger**: Test execution run #${{ github.run_id }}
+            - **Branch**: `${{ github.ref_name }}`
+            - **Commit**: ${{ github.sha }}
+            - **Workflow**: ${{ github.workflow }}
+            - **Scope**: `SRC/pages/*.py` files only
+            
+            ### 🔄 Changes Applied
+            The AutoHeal agent analyzed failed locators in page object files and applied AI-suggested improvements.
+            
+            ### 🧪 Testing Required
+            Please review the changes and verify that:
+            1. The new locators are more robust and reliable
+            2. All affected tests pass with the updated page object locators
+            3. No unintended side effects are introduced in page object interactions
+            
+            ### 📋 Files Changed
+            Only page object files in `SRC/pages/` directory are included in this PR.
+            Check the "Files changed" tab to see all locator modifications.
+            
+            ---
+            *🤖 This PR was automatically created by AutoHeal based on AI analysis of test failures.*
+          labels: |
+            autoheal
+            locator-fix
+            ai-suggested
+            needs-testing
+          assignees: ${{ github.actor }}
+          draft: false
+          delete-branch: true
+          add-paths: |
+            SRC/pages/*.py
+
+      - name: Upload AutoHeal Debug Files
+        if: always() && env.TEST_FAILED == '1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: autoheal-debug-files
+          path: |
+            reports/captured_locator_failures.json
+            reports/dom_snapshot_*.html
+          if-no-files-found: ignore
 
       - name: Extract test statistics
         id: extract-stats

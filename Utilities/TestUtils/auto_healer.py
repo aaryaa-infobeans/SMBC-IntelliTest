@@ -5,7 +5,7 @@ This utility provides AI-powered element location healing when standard locators
 
 import os
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 from openai import AzureOpenAI
 from playwright.sync_api import Error as PlaywrightError
@@ -27,7 +27,7 @@ def get_client():
         _client = AzureOpenAI(
             api_key=api_key,  # from portal
             api_version="2024-05-01-preview",  # check docs for latest
-            azure_endpoint=api_end_point
+            azure_endpoint=api_end_point,
         )
     return _client
 
@@ -53,6 +53,10 @@ class AutoHealer:
         self.last_dom_snapshot = ""
         self.healing_attempts = 0
         self.max_healing_attempts = 3
+
+        # Check if we're in GitHub Actions and should capture suggestions instead of healing
+        self.capture_mode = os.getenv("GITHUB_ACTIONS") == "true"
+        self.captured_failures: list[Dict[str, Any]] = []
 
     def getElement(self, locator: str, description: str = "element") -> Optional[Locator]:
         """
@@ -84,8 +88,22 @@ class AutoHealer:
                 return element
             else:
                 logger.warning(f"Element not found with locator: {locator}")
-                # Directly call AI healing instead of raising exception
-                return self._attempt_ai_healing(locator, description, f"Element not found: {locator}")
+
+                # In GitHub Actions, capture failure AND try to get working locator
+                if self.capture_mode:
+                    # Capture failure and get working locator in one call
+                    working_locator = self._capture_locator_failure(
+                        locator, description, f"Element not found: {locator}"
+                    )
+                    # If capture method found working locator, return it; otherwise try full healing
+                    return (
+                        working_locator
+                        if working_locator
+                        else self._attempt_ai_healing(locator, description, f"Element not found: {locator}")
+                    )
+                else:
+                    # Normal healing mode for local development
+                    return self._attempt_ai_healing(locator, description, f"Element not found: {locator}")
 
         except PlaywrightError as e:
             error_message = str(e)
@@ -99,16 +117,369 @@ class AutoHealer:
             # Handle element not found error
             elif "not found" in error_message.lower() or "timeout" in error_message.lower():
                 logger.warning(f"Element not found, attempting AI healing for: {description}")
-                return self._attempt_ai_healing(locator, description, error_message)
+                if self.capture_mode:
+                    # Capture failure and get working locator in one call
+                    working_locator = self._capture_locator_failure(locator, description, error_message)
+                    # If capture method found working locator, return it; otherwise try full healing
+                    return (
+                        working_locator
+                        if working_locator
+                        else self._attempt_ai_healing(locator, description, error_message)
+                    )
+                else:
+                    return self._attempt_ai_healing(locator, description, error_message)
 
             else:
                 # Other Playwright errors
                 logger.error(f"Unhandled Playwright error: {error_message}")
-                return self._attempt_ai_healing(locator, description, error_message)
+                if self.capture_mode:
+                    # Capture failure and get working locator in one call
+                    working_locator = self._capture_locator_failure(locator, description, error_message)
+                    # If capture method found working locator, return it; otherwise try full healing
+                    return (
+                        working_locator
+                        if working_locator
+                        else self._attempt_ai_healing(locator, description, error_message)
+                    )
+                else:
+                    return self._attempt_ai_healing(locator, description, error_message)
 
         except Exception as e:
             logger.error(f"Unexpected error occurred: {str(e)}")
-            return self._attempt_ai_healing(locator, description, str(e))
+            if self.capture_mode:
+                # Capture failure and get working locator in one call
+                working_locator = self._capture_locator_failure(locator, description, str(e))
+                # If capture method found working locator, return it; otherwise try full healing
+                return working_locator if working_locator else self._attempt_ai_healing(locator, description, str(e))
+            else:
+                return self._attempt_ai_healing(locator, description, str(e))
+
+    def _capture_locator_failure(self, locator: str, description: str, error_message: str) -> Optional[Locator]:
+        """
+        Capture locator failure for later PR creation AND return working locator if found.
+
+        Args:
+            locator: The failing locator
+            description: Description of the element
+            error_message: The error that occurred
+
+        Returns:
+            Working Locator if AI suggests a valid one, None otherwise
+        """
+        working_locator = None
+        ai_suggestion = None
+
+        try:
+            # Find where the locator is defined
+            test_file, test_line = self._find_locator_source(locator)
+
+            # Get AI suggestion for the failing locator
+            ai_suggestion = self._get_ai_suggestion_for_capture(locator, description, error_message)
+
+            # Test the AI suggestion to see if it works
+            if ai_suggestion:
+                try:
+                    element = self.page.locator(ai_suggestion)
+                    if element.count() > 0:
+                        working_locator = element
+                        logger.info(f"✅ AI suggested locator works: {ai_suggestion}")
+                    else:
+                        logger.warning(f"⚠️ AI suggested locator found no elements: {ai_suggestion}")
+                except PlaywrightError as e:
+                    logger.warning(f"⚠️ AI suggested locator failed: {str(e)}")
+
+            # Create and save failure record (regardless of whether AI locator works)
+            failure_record = self._create_failure_record(
+                locator, description, error_message, ai_suggestion, test_file, test_line
+            )
+            self._save_captured_failure(failure_record)
+
+            logger.warning(f"🎯 Captured locator failure for PR creation: {locator} -> {ai_suggestion}")
+
+        except Exception as e:
+            logger.error(f"Error capturing locator failure: {str(e)}")
+
+        return working_locator
+
+    def _find_locator_source(self, locator: str) -> Tuple[Optional[str], Optional[int]]:
+        """Find the source file and line number where the locator is defined."""
+        import inspect
+
+        # First, search codebase for actual locator definition
+        locator_file = self._find_locator_definition_file(locator)
+        if locator_file:
+            test_line = self._find_locator_line_number(locator_file, locator)
+            logger.info(f"Found locator '{locator}' declared in {locator_file}:{test_line}")
+            return locator_file, test_line
+
+        # Fallback: search stack trace for page objects
+        test_file, test_line = self._find_locator_in_stack_trace()
+        if test_file:
+            return test_file, test_line
+
+        return None, None
+
+    def _find_locator_in_stack_trace(self) -> Tuple[Optional[str], Optional[int]]:
+        """Search stack trace for files that might contain locator definitions."""
+        import inspect
+
+        stack = inspect.stack()
+
+        # Look for page objects first
+        for frame_info in stack:
+            filename = frame_info.filename
+            if self._is_page_or_helper_file(filename):
+                return filename, frame_info.lineno
+
+        # Fallback to test files
+        for frame_info in stack:
+            if "test_" in frame_info.filename and frame_info.filename.endswith(".py"):
+                return frame_info.filename, frame_info.lineno
+
+        return None, None
+
+    def _is_page_or_helper_file(self, filename: str) -> bool:
+        """Check if filename is a page object or helper file."""
+        if not filename.endswith(".py"):
+            return False
+
+        return (
+            ("pages/" in filename and "base_page.py" not in filename)
+            or ("page.py" in filename and "base_page.py" not in filename)
+            or ("helpers/" in filename and "base_" not in filename)
+        )
+
+    def _create_failure_record(
+        self, locator: str, description: str, error_message: str, ai_suggestion: str, test_file: str, test_line: int
+    ) -> Dict[str, Any]:
+        """Create a failure record dictionary."""
+        import time
+
+        return {
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "test_file": test_file,
+            "line_number": test_line,
+            "failing_locator": locator,
+            "element_description": description,
+            "error_message": error_message,
+            "suggested_locator": ai_suggestion,
+            "page_url": self.page.url if self.page else "unknown",
+            "page_title": self.page.title() if self.page else "unknown",
+        }
+
+    def _get_ai_suggestion_for_capture(self, locator: str, description: str, error_message: str) -> Optional[str]:
+        """Get AI suggestion for the failing locator (for capture mode)."""
+        try:
+            page_context = self._get_page_context()
+            ai_prompt = self._build_locator_healing_prompt(locator, description, error_message, page_context)
+            return self._get_command_from_ai(ai_prompt, "alternative_locator")
+        except Exception as e:
+            logger.error(f"Error getting AI suggestion for capture: {str(e)}")
+            return None
+
+    def _save_captured_failure(self, failure_record: Dict[str, Any]):
+        """Save captured failure to file for autoheal_agent to process with better handling."""
+        try:
+            reports_dir = "reports"
+            failures_file = self._ensure_reports_directory(reports_dir)
+
+            self._save_failure_with_retry(failures_file, failure_record)
+
+        except Exception as e:
+            logger.error(f"Error saving captured failure: {str(e)}")
+            self._save_to_fallback_file(failure_record, "reports")
+
+    def _ensure_reports_directory(self, reports_dir: str) -> str:
+        """Ensure reports directory exists and return the failures file path."""
+        if not os.path.exists(reports_dir):
+            os.makedirs(reports_dir)
+        return f"{reports_dir}/captured_locator_failures.json"
+
+    def _save_failure_with_retry(self, failures_file: str, failure_record: Dict[str, Any]):
+        """Save failure with retry logic to handle race conditions."""
+        import time
+
+        max_retries = 3
+        retry_delay = 0.1
+
+        for attempt in range(max_retries):
+            try:
+                existing_failures = self._load_existing_failures(failures_file)
+
+                if not self._is_duplicate_failure(failure_record, existing_failures):
+                    existing_failures.append(failure_record)
+                    logger.info(
+                        f"Adding new failure: {failure_record.get('failing_locator', 'unknown')} -> {failure_record.get('suggested_locator', 'none')}"
+                    )
+
+                self._save_failures_atomically(failures_file, existing_failures)
+                logger.info(f"Saved captured failure to {failures_file} (total: {len(existing_failures)} failures)")
+                return  # Success
+
+            except (IOError, OSError) as e:
+                if attempt < max_retries - 1:
+                    logger.warning(f"File operation failed (attempt {attempt + 1}/{max_retries}), retrying: {e}")
+                    time.sleep(retry_delay * (attempt + 1))
+                else:
+                    raise
+
+    def _load_existing_failures(self, failures_file: str) -> list:
+        """Load existing failures from file, handling errors gracefully."""
+        import json
+
+        if not os.path.exists(failures_file):
+            return []
+
+        try:
+            with open(failures_file, "r", encoding="utf-8") as f:
+                content = f.read()
+                if content.strip():
+                    existing_failures = json.loads(content)
+                    logger.debug(f"Loaded {len(existing_failures)} existing failures")
+                    return existing_failures
+        except json.JSONDecodeError as e:
+            logger.warning(f"JSON decode error, starting fresh: {e}")
+        except Exception as e:
+            logger.warning(f"Error reading file, starting fresh: {e}")
+
+        return []
+
+    def _is_duplicate_failure(self, failure_record: Dict[str, Any], existing_failures: list) -> bool:
+        """Check if this failure already exists to avoid duplicates."""
+        failure_signature = self._get_failure_signature(failure_record)
+
+        for existing in existing_failures:
+            existing_signature = self._get_failure_signature(existing)
+            if existing_signature == failure_signature:
+                logger.info(f"Skipping duplicate failure: {failure_record.get('failing_locator', 'unknown')}")
+                return True
+        return False
+
+    def _get_failure_signature(self, failure: Dict[str, Any]) -> str:
+        """Generate a unique signature for a failure record."""
+        return f"{failure.get('failing_locator', '')}_{failure.get('element_description', '')}_{failure.get('test_file', '')}"
+
+    def _save_failures_atomically(self, failures_file: str, failures: list):
+        """Save failures to file atomically to prevent corruption."""
+        import json
+
+        temp_file = f"{failures_file}.tmp"
+        with open(temp_file, "w", encoding="utf-8") as f:
+            json.dump(failures, f, indent=2, ensure_ascii=False)
+            f.flush()
+            os.fsync(f.fileno())  # Force write to disk
+
+        # Atomic rename
+        if os.path.exists(failures_file):
+            os.replace(temp_file, failures_file)
+        else:
+            os.rename(temp_file, failures_file)
+
+    def _save_to_fallback_file(self, failure_record: Dict[str, Any], reports_dir: str):
+        """Save to fallback file when main save fails."""
+        try:
+            import json
+            import time
+
+            fallback_file = f"{reports_dir}/captured_failures_backup_{int(time.time())}.json"
+            with open(fallback_file, "w", encoding="utf-8") as f:
+                json.dump([failure_record], f, indent=2, ensure_ascii=False)
+            logger.warning(f"Saved to fallback file: {fallback_file}")
+        except Exception as fallback_error:
+            logger.error(f"Fallback save also failed: {fallback_error}")
+
+    def _find_locator_definition_file(self, locator: str) -> Optional[str]:
+        """Find the file where the locator is actually defined by searching the codebase."""
+        try:
+            search_paths = self._get_locator_search_paths()
+
+            for pattern in search_paths:
+                file_path = self._search_files_for_locator(pattern, locator)
+                if file_path:
+                    return file_path
+
+        except Exception as e:
+            logger.error(f"Error searching for locator definition: {str(e)}")
+
+        return None
+
+    def _get_locator_search_paths(self) -> list:
+        """Get list of search paths for locator definition files."""
+        import os
+
+        current_dir = os.getcwd()
+        return [
+            os.path.join(current_dir, "SRC", "pages", "*.py"),
+            os.path.join(current_dir, "SRC", "helpers", "*.py"),
+            "SRC/pages/*.py",
+            "SRC/helpers/*.py",
+        ]
+
+    def _search_files_for_locator(self, pattern: str, locator: str) -> Optional[str]:
+        """Search files matching pattern for locator definition."""
+        import glob
+
+        for file_path in glob.glob(pattern):
+            try:
+                if self._file_contains_locator_definition(file_path, locator):
+                    logger.info(f"Found locator '{locator}' declared in: {file_path}")
+                    return file_path
+            except Exception as e:
+                logger.debug(f"Error reading file {file_path}: {e}")
+                continue
+
+        return None
+
+    def _file_contains_locator_definition(self, file_path: str, locator: str) -> bool:
+        """Check if file contains a locator definition."""
+        with open(file_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        for line_num, line in enumerate(lines):
+            if self._is_locator_definition_line(line, locator):
+                return True
+
+        return False
+
+    def _is_locator_definition_line(self, line: str, locator: str) -> bool:
+        """Check if a line contains a locator definition."""
+        if not (locator in line and "=" in line):
+            return False
+
+        equals_pos = line.find("=")
+        locator_pos = line.find(locator)
+
+        # Ensure = comes before the locator and it's in quotes
+        if not (equals_pos < locator_pos and (f'"{locator}"' in line or f"'{locator}'" in line)):
+            return False
+
+        # Check for locator-like variable names
+        left_side = line[:equals_pos].strip()
+        return self._is_locator_variable_name(left_side)
+
+    def _is_locator_variable_name(self, variable_name: str) -> bool:
+        """Check if variable name looks like a locator variable."""
+        locator_patterns = ["loc", "_input", "_button", "_field", "_element", "_selector"]
+        method_call_prefixes = ("self.", "page.", "(", "[")
+
+        return any(pattern in variable_name.lower() for pattern in locator_patterns) and not variable_name.startswith(
+            method_call_prefixes
+        )
+
+    def _find_locator_line_number(self, file_path: str, locator: str) -> Optional[int]:
+        """Find the line number where the locator is defined in the given file."""
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+
+            for i, line in enumerate(lines):
+                if locator in line and ("=" in line or "__loc" in line):
+                    return i + 1  # Convert to 1-based line number
+
+        except Exception as e:
+            logger.error(f"Error finding line number for locator: {str(e)}")
+
+        return 1  # Default to line 1 if not found
 
     def _handle_strict_mode_error(
         self, original_locator: str, description: str, error_message: str
