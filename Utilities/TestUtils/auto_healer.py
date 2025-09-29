@@ -1,6 +1,7 @@
 """
 Auto Healer Utility for Playwright Test Automation
 This utility provides AI-powered element location healing when standard locators fail.
+Enhanced with GitHub PR creation for locator fixes in CI/CD pipelines.
 """
 
 import os
@@ -12,6 +13,7 @@ from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Locator, Page
 
 from Utilities.ReportUtils.logger import get_logger
+from Utilities.TestUtils.github_pr_util import GitHubPRUtil
 
 _client = None
 
@@ -42,17 +44,38 @@ class AutoHealer:
     to suggest alternative locators when the primary ones fail.
     """
 
-    def __init__(self, page: Page):
+    def __init__(self, page: Page, enable_pr_creation: bool = None):
         """
         Initialize the AutoHealer with a Playwright page instance.
 
         Args:
             page: Playwright page instance
+            enable_pr_creation: Whether to enable PR creation for locator fixes.
+                               If None, will auto-detect based on environment settings.
         """
         self.page = page
         self.last_dom_snapshot = ""
         self.healing_attempts = 0
         self.max_healing_attempts = 3
+        
+        # Initialize GitHub PR utility
+        self.github_pr_util = GitHubPRUtil()
+        
+        # Configure PR creation
+        if enable_pr_creation is None:
+            # Auto-enable if running in GitHub Actions and properly configured
+            self.enable_pr_creation = (
+                self.github_pr_util.is_running_in_github_actions() and 
+                self.github_pr_util.is_configured() and
+                os.getenv("AUTOHEALER_ENABLE_PR", "true").lower() == "true"
+            )
+        else:
+            self.enable_pr_creation = enable_pr_creation
+            
+        if self.enable_pr_creation:
+            logger.info("AutoHealer PR creation enabled - will create PRs for locator fixes")
+        else:
+            logger.info("AutoHealer PR creation disabled")
 
     def getElement(self, locator: str, description: str = "element") -> Optional[Locator]:
         """
@@ -149,6 +172,10 @@ class AutoHealer:
                     element = self.page.locator(specific_locator)
                     if element.count() == 1:
                         logger.info(f"Successfully resolved strict mode with AI locator: {specific_locator}")
+                        
+                        # Track the successful strict mode fix for PR creation
+                        self._track_locator_fix(original_locator, specific_locator, description, error_message)
+                        
                         return element
                     else:
                         logger.warning(f"AI locator still has strict mode issues: {specific_locator}")
@@ -202,6 +229,10 @@ class AutoHealer:
 
                     if element.count() > 0:
                         logger.info(f"Successfully healed element using AI locator: {ai_locator}")
+                        
+                        # Track the successful fix for PR creation
+                        self._track_locator_fix(original_locator, ai_locator, description, error_message)
+                        
                         return element
                     else:
                         logger.warning(f"AI suggested locator found no elements: {ai_locator}")
@@ -213,6 +244,10 @@ class AutoHealer:
                             wildcard_element = self.page.locator(wildcard_locator)
                             if wildcard_element.count() > 0:
                                 logger.info(f"Successfully healed element using wildcard variation: {wildcard_locator}")
+                                
+                                # Track the successful wildcard fix for PR creation
+                                self._track_locator_fix(original_locator, wildcard_locator, description, error_message)
+                                
                                 return wildcard_element
 
                 except PlaywrightError as e:
@@ -585,6 +620,110 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
         """Reset the healing attempts counter."""
         self.healing_attempts = 0
         logger.info("Healing attempts counter reset")
+
+    def _track_locator_fix(self, original_locator: str, fixed_locator: str, 
+                          description: str, error_message: str) -> None:
+        """
+        Track a successful locator fix for potential PR creation.
+        
+        Args:
+            original_locator: The original failing locator
+            fixed_locator: The working replacement locator
+            description: Description of the element
+            error_message: The original error message
+        """
+        if not self.enable_pr_creation:
+            return
+            
+        try:
+            # Find the test file and function where this locator is used
+            file_path, test_function, line_number = self.github_pr_util.find_locator_in_test_files(
+                original_locator, description
+            )
+            
+            if file_path:
+                logger.info(f"Found locator usage in {file_path}:{line_number} ({test_function})")
+                
+                # Add the fix to the batch
+                self.github_pr_util.add_locator_fix(
+                    original_locator=original_locator,
+                    suggested_locator=fixed_locator,
+                    file_path=file_path,
+                    description=description,
+                    error_message=error_message,
+                    test_function=test_function,
+                    line_number=line_number
+                )
+            else:
+                logger.warning(f"Could not find test file location for locator: {original_locator}")
+                
+        except Exception as e:
+            logger.error(f"Error tracking locator fix: {str(e)}")
+
+    def create_pr_for_collected_fixes(self) -> Optional[str]:
+        """
+        Create a GitHub PR for all collected locator fixes.
+        
+        Returns:
+            PR URL if successful, None otherwise
+        """
+        if not self.enable_pr_creation:
+            logger.info("PR creation is disabled")
+            return None
+            
+        try:
+            return self.github_pr_util.create_pr_for_fixes()
+        except Exception as e:
+            logger.error(f"Failed to create PR for locator fixes: {str(e)}")
+            return None
+
+    def get_tracked_fixes_count(self) -> int:
+        """
+        Get the number of locator fixes tracked for PR creation.
+        
+        Returns:
+            Number of tracked fixes
+        """
+        if not self.enable_pr_creation:
+            return 0
+        return len(self.github_pr_util.locator_fixes)
+
+    def clear_tracked_fixes(self) -> None:
+        """Clear all tracked locator fixes."""
+        if self.enable_pr_creation:
+            self.github_pr_util.locator_fixes.clear()
+            logger.info("Cleared all tracked locator fixes")
+
+
+# Global AutoHealer instance for PR management
+_global_autohealer_pr_manager = None
+
+
+def get_autohealer_pr_manager() -> Optional[GitHubPRUtil]:
+    """
+    Get the global AutoHealer PR manager for creating PRs across multiple test sessions.
+    
+    Returns:
+        GitHubPRUtil instance if available, None otherwise
+    """
+    global _global_autohealer_pr_manager
+    if _global_autohealer_pr_manager is None:
+        _global_autohealer_pr_manager = GitHubPRUtil()
+    return _global_autohealer_pr_manager
+
+
+def create_pr_for_session_fixes() -> Optional[str]:
+    """
+    Create a PR for all locator fixes collected during the test session.
+    This function can be called at the end of test execution.
+    
+    Returns:
+        PR URL if successful, None otherwise
+    """
+    pr_manager = get_autohealer_pr_manager()
+    if pr_manager and pr_manager.is_configured():
+        return pr_manager.create_pr_for_fixes()
+    return None
 
 
 # End of AutoHealer class
