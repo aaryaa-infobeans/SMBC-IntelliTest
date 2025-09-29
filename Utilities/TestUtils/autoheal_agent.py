@@ -4,18 +4,13 @@ import re
 import subprocess
 from typing import Dict, List, Optional, Tuple
 
-from github import Github
 from openai import AzureOpenAI
 
 # AutoHealer functionality used indirectly through captured failures file
 
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-3.5-turbo")
-REPO_NAME = os.getenv("GITHUB_REPOSITORY")
-BASE_BRANCH = os.getenv("GITHUB_REF_NAME", "main")
-BRANCH_PREFIX = "autoheal/locator-fix"
 
 
 # Initialize Azure OpenAI client with validation
@@ -190,134 +185,6 @@ def extract_element_description(error_log: str, locator: str) -> str:
     return "element"
 
 
-def get_ai_suggested_locator(failure: LocatorFailure) -> Optional[str]:
-    """
-    Use AutoHealer AI functionality to get a suggested replacement locator.
-
-    This leverages the existing auto_healer.py logic but in a simulated context
-    since we don't have an actual Page object during post-test analysis.
-    """
-    print(f"🤖 Getting AI suggestion for locator: {failure.failing_locator}")
-
-    try:
-        # Create a mock page context for the AI prompt
-        page_context = {
-            "url": "test-page",
-            "title": "Test Page",
-            "test_name": failure.test_name,
-            "file_path": failure.file_path,
-            "line_number": failure.line_number,
-        }
-
-        # Use the same prompt engineering from auto_healer.py
-        system_prompt = """You are an expert QA automation engineer using Playwright. Your task is to analyze the failed locator and suggest a better CSS selector or XPath that can be used with page.locator().
-
-**CRITICAL RULES**:
-1. **Be Precise**: Your selectors MUST target exactly one element.
-2. **Return CSS Selectors or XPath**: Only return selectors that work with page.locator(), NOT getByRole() or other Playwright methods.
-
-**PREFERRED LOCATOR STRATEGIES** (in order of preference):
-1. **Test IDs and Data Attributes** (most reliable):
-   - `[data-testid='submit-btn']`
-   - `[data-test='login-button']`
-
-2. **Semantic HTML attributes**:
-   - `[aria-label='Submit form']`
-   - `input[placeholder='Enter username']`
-
-3. **ID and Name attributes**:
-   - `#submit-button`
-   - `input[name='username']`
-
-**OUTPUT**: Return ONLY a CSS selector or XPath string that works with page.locator()."""
-
-        ai_prompt = f"""{system_prompt}
-
-**HEALING CONTEXT**:
-- Failed locator: '{failure.failing_locator}'
-- Element description: '{failure.element_description}'
-- Error: {failure.error_message}
-- Test: {failure.test_name}
-- File: {failure.file_path}:{failure.line_number}
-
-**TASK**: Suggest a better, more robust CSS selector or XPath for the '{failure.element_description}' element.
-
-**OUTPUT**: Return ONLY a CSS selector or XPath string."""
-
-        # Use the OpenAI client (prefer local client, fallback to auto_healer client)
-        ai_client = client
-        if not ai_client:
-            print("⚠️ Local OpenAI client not available, trying auto_healer client...")
-            from .auto_healer import get_client
-
-            ai_client = get_client()
-
-        if not ai_client:
-            print("❌ No OpenAI client available")
-            return None
-
-        response = ai_client.chat.completions.create(
-            model=AZURE_OPENAI_DEPLOYMENT,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a Playwright automation expert. Provide only locator strings, no explanations.",
-                },
-                {"role": "user", "content": ai_prompt},
-            ],
-            max_tokens=100,
-            temperature=0.1,
-        )
-
-        suggested_locator = response.choices[0].message.content.strip()
-
-        # Clean up the response (remove quotes, extra text)
-        suggested_locator = suggested_locator.strip("\"'`")
-
-        print(f"✅ AI suggested locator: {suggested_locator}")
-        return suggested_locator
-
-    except Exception as e:
-        print(f"❌ Error getting AI suggestion: {str(e)}")
-        return None
-
-
-def attempt_manual_file_edit(failure: LocatorFailure, new_locator: str) -> bool:
-    """
-    Manual file editing as a fallback when patch fails.
-    Directly modifies the file content without using git patch.
-    """
-    try:
-        relative_path = get_relative_path(failure.file_path)
-        file_to_edit = failure.file_path if os.path.exists(failure.file_path) else relative_path
-        
-        with open(file_to_edit, "r", encoding="utf-8") as f:
-            content = f.read()
-        
-        # Simple string replacement approach
-        old_content = content
-        new_content = content.replace(f'"{failure.failing_locator}"', f'"{new_locator}"')
-        
-        # If double quotes didn't work, try single quotes
-        if new_content == old_content:
-            new_content = content.replace(f"'{failure.failing_locator}'", f"'{new_locator}'")
-        
-        if new_content == old_content:
-            print(f"❌ Could not find and replace locator '{failure.failing_locator}' in file")
-            return False
-        
-        # Write back the modified content
-        with open(file_to_edit, "w", encoding="utf-8") as f:
-            f.write(new_content)
-        
-        print(f"✅ Successfully replaced '{failure.failing_locator}' with '{new_locator}'")
-        return True
-        
-    except Exception as e:
-        print(f"❌ Manual edit failed: {str(e)}")
-        return False
-
-
 def get_relative_path(file_path: str) -> str:
     """Convert absolute path to relative path for git operations."""
     if not os.path.isabs(file_path):
@@ -372,16 +239,18 @@ def create_locator_fix_patch(failure: LocatorFailure, new_locator: str) -> str:
                 if failure.failing_locator in line and "=" in line:
                     equals_pos = line.find("=")
                     locator_pos = line.find(failure.failing_locator)
-                    
+
                     # Ensure = comes before the locator and it's in quotes
-                    if equals_pos < locator_pos and (f'"{failure.failing_locator}"' in line or f"'{failure.failing_locator}'" in line):
+                    if equals_pos < locator_pos and (
+                        f'"{failure.failing_locator}"' in line or f"'{failure.failing_locator}'" in line
+                    ):
                         # Additional validation: look for locator-like variable names
                         left_side = line[:equals_pos].strip()
                         if any(
                             pattern in left_side.lower()
                             for pattern in ["loc", "_input", "_button", "_field", "_element", "_selector"]
                         ) and not left_side.startswith(("self.", "page.", "(", "[")):
-                            
+
                             found_line_index = i
                             original_line = line
                             modified_line = line.replace(f'"{failure.failing_locator}"', f'"{new_locator}"')
@@ -412,148 +281,101 @@ def create_locator_fix_patch(failure: LocatorFailure, new_locator: str) -> str:
         return ""
 
 
-def apply_locator_fix_and_create_pr(failure: LocatorFailure) -> Optional[str]:
+def apply_locator_fix_directly(failure: LocatorFailure) -> bool:
     """
-    Apply the locator fix and create a PR for the specific locator replacement.
+    Apply the locator fix directly to the file.
+    This approach works with peter-evans/create-pull-request GitHub Action.
     """
     if not failure.suggested_locator:
         print(f"❌ No suggested locator available for {failure.test_name}")
-        return None
+        return False
 
     try:
-        # Validate environment
-        if not GITHUB_TOKEN or not REPO_NAME:
-            print("❌ GitHub configuration not available")
-            return None
+        # Get the file path to modify
+        relative_path = get_relative_path(failure.file_path)
+        file_to_edit = failure.file_path if os.path.exists(failure.file_path) else relative_path
 
-        # Create branch name
-        safe_test_name = failure.test_name.replace("/", "_").replace("::", "_")
-        branch_name = f"{BRANCH_PREFIX}_{safe_test_name}_{os.urandom(4).hex()}"
+        print(f"🔧 Applying locator fix to: {file_to_edit}")
+        print(f"   Old locator: {failure.failing_locator}")
+        print(f"   New locator: {failure.suggested_locator}")
 
-        # Create patch
-        patch = create_locator_fix_patch(failure, failure.suggested_locator)
-        if not patch:
-            return None
+        # Read the file
+        with open(file_to_edit, "r", encoding="utf-8") as f:
+            lines = f.readlines()
 
-        # Apply patch
-        patch_file = "locator_fix.patch"
-        with open(patch_file, "w", encoding="utf-8") as f:
-            f.write(patch)
+        if failure.line_number > len(lines):
+            print(f"❌ Line number {failure.line_number} exceeds file length")
+            return False
 
-        print(f"📄 Created patch file: {patch_file}")
-        print(f"📄 Patch content:")
-        print(patch)
-        
         # Show current file content around the target line for debugging
-        try:
-            with open(get_relative_path(failure.file_path), "r", encoding="utf-8") as f:
-                current_lines = f.readlines()
-                
-            print(f"📋 Current file content around line {failure.line_number}:")
-            start_line = max(0, failure.line_number - 3)
-            end_line = min(len(current_lines), failure.line_number + 2)
-            
-            for i in range(start_line, end_line):
-                marker = ">>> " if i + 1 == failure.line_number else "    "
-                print(f"{marker}{i+1:3}: {current_lines[i].rstrip()}")
-        except Exception as e:
-            print(f"⚠️ Could not read current file content: {e}")
+        print(f"📋 Current file content around line {failure.line_number}:")
+        start_line = max(0, failure.line_number - 3)
+        end_line = min(len(lines), failure.line_number + 2)
 
-        # Git operations
-        subprocess.run(["git", "checkout", "-b", branch_name], check=True)
-        print(f"📦 Applying patch: {patch_file}")
-        result = subprocess.run(["git", "apply", patch_file], capture_output=True, text=True)
+        for i in range(start_line, end_line):
+            marker = ">>> " if i + 1 == failure.line_number else "    "
+            print(f"{marker}{i+1:3}: {lines[i].rstrip()}")
 
-        if result.returncode != 0:
-            print(f"❌ Initial git apply failed, trying with whitespace options...")
-            print(f"   stdout: {result.stdout}")
-            print(f"   stderr: {result.stderr}")
-            
-            # Try with whitespace/formatting tolerance
-            result2 = subprocess.run(["git", "apply", "--ignore-space-change", "--ignore-whitespace", patch_file], 
-                                   capture_output=True, text=True)
-            
-            if result2.returncode != 0:
-                print(f"❌ Git apply with whitespace options also failed:")
-                print(f"   stdout: {result2.stdout}")
-                print(f"   stderr: {result2.stderr}")
-                
-                # Last resort: manual file editing
-                print(f"🔧 Attempting manual file edit as fallback...")
-                if attempt_manual_file_edit(failure, failure.suggested_locator):
-                    print(f"✅ Manual edit successful")
-                else:
-                    raise subprocess.CalledProcessError(result.returncode, ["git", "apply", patch_file])
-            else:
-                print(f"✅ Patch applied successfully with whitespace options")
+        # Try to find and replace the locator
+        modified = False
+        line_index = failure.line_number - 1  # Convert to 0-based index
+        original_line = lines[line_index]
+
+        # Try replacing with double quotes first
+        if f'"{failure.failing_locator}"' in original_line:
+            lines[line_index] = original_line.replace(f'"{failure.failing_locator}"', f'"{failure.suggested_locator}"')
+            modified = True
+        # Try single quotes
+        elif f"'{failure.failing_locator}'" in original_line:
+            lines[line_index] = original_line.replace(f"'{failure.failing_locator}'", f"'{failure.suggested_locator}'")
+            modified = True
         else:
-            print(f"✅ Patch applied successfully")
+            # Search the entire file if not found on specific line
+            print(f"⚠️ Locator not found on line {failure.line_number}, searching entire file...")
+            for i, line in enumerate(lines):
+                if failure.failing_locator in line and "=" in line:
+                    equals_pos = line.find("=")
+                    locator_pos = line.find(failure.failing_locator)
 
-        # Use relative path for git add as well
-        relative_file_path = get_relative_path(failure.file_path)
-        subprocess.run(["git", "add", relative_file_path], check=True)
+                    # Ensure = comes before the locator and it's in quotes
+                    if equals_pos < locator_pos and (
+                        f'"{failure.failing_locator}"' in line or f"'{failure.failing_locator}'" in line
+                    ):
+                        # Additional validation: look for locator-like variable names
+                        left_side = line[:equals_pos].strip()
+                        if any(
+                            pattern in left_side.lower()
+                            for pattern in ["loc", "_input", "_button", "_field", "_element", "_selector"]
+                        ) and not left_side.startswith(("self.", "page.", "(", "[")):
 
-        commit_msg = f"""🔧 AutoHeal: Fix locator in {failure.test_name}
+                            if f'"{failure.failing_locator}"' in line:
+                                lines[i] = line.replace(
+                                    f'"{failure.failing_locator}"', f'"{failure.suggested_locator}"'
+                                )
+                            else:
+                                lines[i] = line.replace(
+                                    f"'{failure.failing_locator}'", f"'{failure.suggested_locator}'"
+                                )
 
-Location: {failure.file_path}:{failure.line_number}
-Old locator: {failure.failing_locator}
-New locator: {failure.suggested_locator}
-Element: {failure.element_description}"""
+                            print(f"✅ Found and replaced locator on line {i + 1}")
+                            failure.line_number = i + 1  # Update line number for logging
+                            modified = True
+                            break
 
-        subprocess.run(["git", "commit", "-m", commit_msg], check=True)
-        subprocess.run(["git", "push", "origin", branch_name], check=True)
+        if not modified:
+            print(f"❌ Could not find locator '{failure.failing_locator}' in file")
+            return False
 
-        # Create PR
-        gh = Github(GITHUB_TOKEN)
-        repo = gh.get_repo(REPO_NAME)
+        # Write the modified content back to file
+        with open(file_to_edit, "w", encoding="utf-8") as f:
+            f.writelines(lines)
 
-        pr_body = f"""## 🔧 AutoHeal Locator Fix
-
-**Test:** `{failure.test_name}`  
-**File:** `{failure.file_path}:{failure.line_number}`  
-**Element:** {failure.element_description}
-
-### 🔄 Locator Change
-```diff
-- "{failure.failing_locator}"
-+ "{failure.suggested_locator}"
-```
-
-### 📋 Details
-- **Original Error:** {failure.error_message[:200]}...
-- **AI Confidence:** High (AI-suggested replacement)
-- **Impact:** Single locator replacement at specific line
-
-### 🧪 Testing Required
-Please verify this locator works correctly in the test environment before merging.
-
----
-*🤖 This PR was automatically created by AutoHeal based on AI analysis of test failures.*
-"""
-
-        pr = repo.create_pull(
-            title=f"🔧 Fix locator in {failure.test_name}",
-            body=pr_body,
-            head=branch_name,
-            base=BASE_BRANCH,
-        )
-
-        # Add labels
-        try:
-            pr.add_to_labels("autoheal", "locator-fix", "ai-suggested", "needs-testing")
-        except Exception as e:
-            print(f"⚠️ Could not add labels: {e}")
-
-        print(f"✅ Locator fix PR created: {pr.html_url}")
-        return pr.html_url
+        print(f"✅ Successfully applied locator fix to {file_to_edit}")
+        return True
 
     except Exception as e:
-        print(f"❌ Failed to create locator fix PR: {str(e)}")
-        return None
-    finally:
-        # Cleanup
-        if os.path.exists("locator_fix.patch"):
-            os.remove("locator_fix.patch")
+        print(f"❌ Error applying locator fix: {str(e)}")
+        return False
 
 
 # Note: Manual review PR functionality removed as we now focus on targeted locator fixes
@@ -611,14 +433,14 @@ def process_failures():
             print(f"   📝 Element: {failure.element_description}")
 
             if failure.suggested_locator:
-                # Create PR with targeted locator fix
-                pr_url = apply_locator_fix_and_create_pr(failure)
+                # Apply locator fix directly (PR will be created by GitHub Action)
+                success = apply_locator_fix_directly(failure)
 
-                if pr_url:
+                if success:
                     healed_count += 1
-                    print(f"✅ Locator fix PR created: {pr_url}")
+                    print(f"✅ Locator fix applied: {failure.file_path}")
                 else:
-                    print(f"❌ Failed to create PR for {failure.file_path}")
+                    print(f"❌ Failed to apply fix for {failure.file_path}")
             else:
                 print(f"⚠️ No AI suggestion available - skipping")
 

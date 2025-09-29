@@ -234,14 +234,49 @@ jobs:
       - name: Auto-healing (if failed)
         if: env.TEST_FAILED == '1'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
         run: |
-          # Configure Git user identity for commits
-          git config --global user.email "autoheal@github-actions.com"
-          git config --global user.name "AutoHeal Agent"
           python Utilities/TestUtils/autoheal_agent.py
+
+      - name: Create Pull Request for AutoHeal fixes
+        if: env.TEST_FAILED == '1'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "🔧 AutoHeal: Fix failing test locators"
+          branch: autoheal/locator-fixes-${{ github.run_id }}
+          title: "🔧 AutoHeal: Fix failing test locators from run #${{ github.run_id }}"
+          body: |
+            ## 🔧 AutoHeal Locator Fixes
+            
+            This PR contains automated locator fixes detected by the AutoHeal system.
+            
+            ### 🎯 Details
+            - **Trigger**: Test execution run #${{ github.run_id }}
+            - **Branch**: `${{ github.ref_name }}`
+            - **Commit**: ${{ github.sha }}
+            
+            ### 🔄 Changes Applied
+            The AutoHeal agent analyzed failed locators and applied AI-suggested improvements.
+            
+            ### 🧪 Testing Required
+            Please review the changes and verify that:
+            1. The new locators are more robust and reliable
+            2. All affected tests pass with the updated locators
+            3. No unintended side effects are introduced
+            
+            ### 📋 Files Changed
+            Check the "Files changed" tab to see all locator modifications.
+            
+            ---
+            *🤖 This PR was automatically created by AutoHeal based on AI analysis of test failures.*
+          token: ${{ secrets.GITHUB_TOKEN }}
+          labels: |
+            autoheal
+            locator-fix
+            ai-suggested
+            needs-testing
+          delete-branch: true
 
       - name: Upload AutoHeal Debug Files
         if: always() && env.TEST_FAILED == '1'
