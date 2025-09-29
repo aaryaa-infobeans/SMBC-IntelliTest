@@ -243,6 +243,15 @@ jobs:
           git config --global user.name "AutoHeal Agent"
           python Utilities/TestUtils/autoheal_agent.py
 
+      - name: Upload AutoHeal Debug Files
+        if: always() && env.TEST_FAILED == '1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: autoheal-debug-files
+          path: |
+            reports/captured_locator_failures.json
+            reports/dom_snapshot_*.html
+          if-no-files-found: ignore
 
       - name: Extract test statistics
         id: extract-stats

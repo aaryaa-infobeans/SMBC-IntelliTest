@@ -150,12 +150,24 @@ class AutoHealer:
             test_file = None
             test_line = None
             
-            # Look for test file in the stack (usually has 'test_' in the name)
+            # Look for the file where the locator is actually defined (pages/ or helpers/)
+            # Priority: pages > helpers > base > tests (to find where locator is defined)
             for frame_info in stack:
-                if 'test_' in frame_info.filename and frame_info.filename.endswith('.py'):
-                    test_file = frame_info.filename
-                    test_line = frame_info.lineno
-                    break
+                filename = frame_info.filename
+                if filename.endswith('.py'):
+                    # Prioritize page objects and helpers where locators are typically defined
+                    if any(pattern in filename for pattern in ['pages/', 'page.py', 'helpers/', 'helper.py']):
+                        test_file = filename
+                        test_line = frame_info.lineno
+                        break
+            
+            # Fallback to test file if no page/helper found
+            if not test_file:
+                for frame_info in stack:
+                    if 'test_' in frame_info.filename and frame_info.filename.endswith('.py'):
+                        test_file = frame_info.filename
+                        test_line = frame_info.lineno
+                        break
             
             # Get AI suggested locator
             ai_suggestion = self._get_ai_suggestion_for_capture(locator, description, error_message)

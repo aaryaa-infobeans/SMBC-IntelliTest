@@ -296,20 +296,38 @@ def create_locator_fix_patch(failure: LocatorFailure, new_locator: str) -> str:
             print(f"❌ Line number {failure.line_number} exceeds file length")
             return ""
 
-        # Find and replace the locator on the specific line
+        # First try the specific line number
         line_index = failure.line_number - 1  # Convert to 0-based index
         original_line = lines[line_index]
-
-        # Create modified line with new locator
         modified_line = original_line.replace(f'"{failure.failing_locator}"', f'"{new_locator}"')
 
         # If double quotes didn't work, try single quotes
         if modified_line == original_line:
             modified_line = original_line.replace(f"'{failure.failing_locator}'", f"'{new_locator}'")
 
+        # If locator not found on specific line, search the entire file
         if modified_line == original_line:
-            print(f"❌ Could not find locator '{failure.failing_locator}' on line {failure.line_number}")
-            return ""
+            print(f"⚠️  Locator '{failure.failing_locator}' not found on line {failure.line_number}")
+            print("🔍 Searching entire file for the locator...")
+            
+            # Search for the locator in the entire file
+            found_line_index = None
+            for i, line in enumerate(lines):
+                if failure.failing_locator in line and ('=' in line or 'locator' in line.lower()):
+                    found_line_index = i
+                    original_line = line
+                    modified_line = line.replace(f'"{failure.failing_locator}"', f'"{new_locator}"')
+                    if modified_line == original_line:
+                        modified_line = line.replace(f"'{failure.failing_locator}'", f"'{new_locator}'")
+                    
+                    if modified_line != original_line:
+                        print(f"✅ Found locator on line {i + 1}: {line.strip()}")
+                        failure.line_number = i + 1  # Update the line number
+                        break
+            
+            if found_line_index is None:
+                print(f"❌ Could not find locator '{failure.failing_locator}' anywhere in the file")
+                return ""
 
         # Create unified diff patch
         patch = f"""--- a/{failure.file_path}
@@ -499,12 +517,8 @@ def process_failures():
         f"\n🎉 AutoHeal Summary: Created {healed_count} locator fix PR(s) out of {len(captured_failures)} captured failures"
     )
 
-    # Clean up the captured failures file after processing
-    try:
-        os.remove(captured_failures_file)
-        print(f"🧹 Cleaned up {captured_failures_file}")
-    except Exception as e:
-        print(f"⚠️ Could not clean up captured failures file: {e}")
+    # Keep the captured failures file as artifact for debugging - DO NOT delete
+    print(f"📁 Captured failures file preserved for artifact upload: {captured_failures_file}")
 
 
 if __name__ == "__main__":
