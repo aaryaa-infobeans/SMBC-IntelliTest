@@ -282,14 +282,33 @@ def get_ai_suggested_locator(failure: LocatorFailure) -> Optional[str]:
         return None
 
 
+def get_relative_path(file_path: str) -> str:
+    """Convert absolute path to relative path for git operations."""
+    if not os.path.isabs(file_path):
+        return file_path
+
+    path_parts = file_path.replace("\\", "/").split("/")
+    known_dirs = ["SRC", "Utilities", "TestDataCommon"]
+    for i, part in enumerate(path_parts):
+        if part in known_dirs:
+            return "/".join(path_parts[i:])
+
+    return file_path  # Return original if no known directory found
+
+
 def create_locator_fix_patch(failure: LocatorFailure, new_locator: str) -> str:
     """
     Create a targeted patch that replaces the old locator with the new one
     at the specific file location.
     """
     try:
-        # Read the target file
-        with open(failure.file_path, "r", encoding="utf-8") as f:
+        # Convert absolute path to relative path for git patch
+        relative_path = get_relative_path(failure.file_path)
+        print(f"🔧 Using relative path for patch: {relative_path}")
+
+        # Read the target file - use relative path for reading if absolute path doesn't work
+        file_to_read = failure.file_path if os.path.exists(failure.file_path) else relative_path
+        with open(file_to_read, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         if failure.line_number > len(lines):
@@ -329,9 +348,9 @@ def create_locator_fix_patch(failure: LocatorFailure, new_locator: str) -> str:
                 print(f"❌ Could not find locator '{failure.failing_locator}' anywhere in the file")
                 return ""
 
-        # Create unified diff patch
-        patch = f"""--- a/{failure.file_path}
-+++ b/{failure.file_path}
+        # Create unified diff patch using relative path
+        patch = f"""--- a/{relative_path}
++++ b/{relative_path}
 @@ -{failure.line_number},1 +{failure.line_number},1 @@
 -{original_line.rstrip()}
 +{modified_line.rstrip()}
@@ -372,10 +391,26 @@ def apply_locator_fix_and_create_pr(failure: LocatorFailure) -> Optional[str]:
         with open(patch_file, "w", encoding="utf-8") as f:
             f.write(patch)
 
+        print(f"📄 Created patch file: {patch_file}")
+        print(f"📄 Patch content preview:")
+        print(patch[:200] + "..." if len(patch) > 200 else patch)
+
         # Git operations
         subprocess.run(["git", "checkout", "-b", branch_name], check=True)
-        subprocess.run(["git", "apply", patch_file], check=True)
-        subprocess.run(["git", "add", failure.file_path], check=True)
+        print(f"📦 Applying patch: {patch_file}")
+        result = subprocess.run(["git", "apply", patch_file], capture_output=True, text=True)
+
+        if result.returncode != 0:
+            print(f"❌ Git apply failed:")
+            print(f"   stdout: {result.stdout}")
+            print(f"   stderr: {result.stderr}")
+            raise subprocess.CalledProcessError(result.returncode, ["git", "apply", patch_file])
+
+        print(f"✅ Patch applied successfully")
+
+        # Use relative path for git add as well
+        relative_file_path = get_relative_path(failure.file_path)
+        subprocess.run(["git", "add", relative_file_path], check=True)
 
         commit_msg = f"""🔧 AutoHeal: Fix locator in {failure.test_name}
 

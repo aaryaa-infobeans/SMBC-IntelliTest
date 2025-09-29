@@ -29,12 +29,15 @@ class LoginPage(BasePage):
         logger.info("Successfully entered username")
 
     @step("Entering password")
-    def enter_password(self, password: str):
+    def enter_password(self, password: str, use_password_locator: bool = False):
         """Fill the password input field with the provided password.
         :param password: The password to be entered.
         """
         logger.debug("Entering password")
-        self.fill(self.__loc_password_input, password, description="password input field")
+        if use_password_locator:
+            self.fill("#password", password, description="password input field")
+        else:
+            self.fill(self.__loc_password_input, password, description="password input field")
         logger.info("Successfully entered password")
 
     @step("Clicking login button")
