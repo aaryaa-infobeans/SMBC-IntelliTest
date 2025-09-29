@@ -1,0 +1,35 @@
+[
+  {
+    "timestamp": "2025-09-29 15:54:41",
+    "test_file": "/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py",
+    "line_number": 13,
+    "failing_locator": "#passwd",
+    "element_description": "password input field",
+    "error_message": "Element not found: #passwd",
+    "suggested_locator": "input[type='password']",
+    "page_url": "https://www.saucedemo.com/v1/",
+    "page_title": "Swag Labs"
+  },
+  {
+    "timestamp": "2025-09-29 15:55:12",
+    "test_file": "/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py",
+    "line_number": 16,
+    "failing_locator": "//*[contains(text(), \"Lgout\")]",
+    "element_description": "logout button",
+    "error_message": "Element not found: //*[contains(text(), \"Lgout\")]",
+    "suggested_locator": "//button[contains(text(), 'Logout')]",
+    "page_url": "https://www.saucedemo.com/v1/inventory.html",
+    "page_title": "Swag Labs"
+  },
+  {
+    "timestamp": "2025-09-29 15:55:13",
+    "test_file": "/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py",
+    "line_number": 12,
+    "failing_locator": "#user-name",
+    "element_description": "username input field",
+    "error_message": "Element not found: #user-name",
+    "suggested_locator": "input[name='user-name']",
+    "page_url": "https://www.saucedemo.com/v1/inventory.html",
+    "page_title": "Swag Labs"
+  }
+]

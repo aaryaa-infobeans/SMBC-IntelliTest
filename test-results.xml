@@ -1,0 +1,1299 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="5" failures="21" skipped="7" tests="58" time="97.048" timestamp="2025-09-29T15:54:35.601082" hostname="runnervm3ublj"><testcase classname="SRC.tests.tests_api.test_bookers_api.TestBookersApi" name="test_booker_api" time="0.268"><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Session created successfully
+INFO     TestAutomationFramework:logger.py:84 Session created successfully
+INFO     TestAutomationFramework:logger.py:84 Making POST request to /auth, with kwargs: {'headers': {'Content-Type': 'application/json'}, 'data': '{"username": "admin", "password": "password123"}', 'timeout': 30}
+INFO     TestAutomationFramework:logger.py:84 POST request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Request time taken by __post_request: 0.26102781295776367
+INFO     TestAutomationFramework:logger.py:84 Request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Session closed successfully
+INFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0001811981201171875
+INFO     TestAutomationFramework:logger.py:84 Session closed successfully
+INFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.00023031234741210938
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_api.test_bookers_api.TestBookersApi" name="test_create_booking" time="0.223"><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Session created successfully
+INFO     TestAutomationFramework:logger.py:84 Making POST request to /booking, with kwargs: {'data': '{"firstname": "April", "lastname": "Allen", "totalprice": 7762, "depositpaid": true, "bookingdates": {"checkin": "1980-11-23", "checkout": "2018-06-29"}, "additionalneeds": "Throw have fact begin. Particularly I along despite everybody.\\nPick cause chair fly. Dog this particularly in movement TV take himself. Line send feeling table trial college."}', 'timeout': 30}
+INFO     TestAutomationFramework:logger.py:84 POST request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Request time taken by __post_request: 0.2181565761566162
+INFO     TestAutomationFramework:logger.py:84 Request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Booking ID: 2222
+INFO     TestAutomationFramework:logger.py:84 Session closed successfully
+INFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0013477802276611328
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_api.test_bookers_api.TestBookersApi" name="test_get_booking" time="0.331"><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Session created successfully
+INFO     TestAutomationFramework:logger.py:84 Making GET request to /booking, with kwargs: {'timeout': 30}
+INFO     TestAutomationFramework:logger.py:84 GET request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Request time taken by __get_request: 0.326585054397583
+INFO     TestAutomationFramework:logger.py:84 Request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Session closed successfully
+INFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0013585090637207031
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_api.test_bookers_api.TestBookersApi" name="test_update_booking" time="0.227"><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Session created successfully
+INFO     TestAutomationFramework:logger.py:84 Updating the booking with Booking ID: 2222
+INFO     TestAutomationFramework:logger.py:84 Making PUT request to /booking/2222, with kwargs: {'timeout': 30, 'data': '{"firstname": "James", "lastname": "Brown", "totalprice": 111, "depositpaid": true, "bookingdates": {"checkin": "2018-01-01", "checkout": "2019-01-01"}, "additionalneeds": "Breakfast"}'}
+INFO     TestAutomationFramework:logger.py:84 PUT request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Request time taken by __put_request: 0.22283458709716797
+INFO     TestAutomationFramework:logger.py:84 Request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Session closed successfully
+INFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0013477802276611328
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_verify_successful_registration_with_valid_data" time="0.001"><properties><property name="test_key" value="MYS-29" /></properties><failure message="AttributeError: 'TestAccountRegistrationFlow' object has no attribute 'login_helper'">SRC/tests/tests_ui/test_account_registration.py:20: in test_verify_successful_registration_with_valid_data
+    self.login_helper.login(
+E   AttributeError: 'TestAccountRegistrationFlow' object has no attribute 'login_helper'</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_validate_error_for_duplicate_email_registration" time="0.001"><properties><property name="test_key" value="MYS-30" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_password_strength_validation" time="0.001"><skipped type="pytest.skip" message="Skipping OTP verification test">/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_account_registration.py:32: Skipping OTP verification test</skipped><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_check_otp_verification_during_registration" time="0.001"><properties><property name="test_key" value="MYS-32" /></properties><failure message="AssertionError: Random failure: OTP verification">SRC/tests/tests_ui/test_account_registration.py:47: in test_check_otp_verification_during_registration
+    assert random.choice([True, False]), "Random failure: OTP verification"
+E   AssertionError: Random failure: OTP verification</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_verify_mandatory_fields_are_enforced" time="0.001"><properties><property name="test_key" value="MYS-33" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_social_media_registration_google_facebook" time="0.001"><properties><property name="test_key" value="MYS-34" /></properties><failure message="AssertionError: Random failure: Social media registration">SRC/tests/tests_ui/test_account_registration.py:58: in test_social_media_registration_google_facebook
+    assert random.choice(["google", "facebook"]) == "google", "Random failure: Social media registration"
+E   AssertionError: Random failure: Social media registration</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_check_mobile_number_verification" time="0.001"><properties><property name="test_key" value="MYS-35" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_validate_error_for_invalid_email_format" time="0.001"><properties><property name="test_key" value="MYS-36" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_verify_email_confirmation_sent_post_registration" time="0.001"><properties><property name="test_key" value="MYS-37" /></properties><failure message="AssertionError: Random failure: Email confirmation">SRC/tests/tests_ui/test_account_registration.py:79: in test_verify_email_confirmation_sent_post_registration
+    assert random.choice([True, False]), "Random failure: Email confirmation"
+E   AssertionError: Random failure: Email confirmation</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_check_redirection_to_dashboard_post_signup" time="0.001"><properties><property name="test_key" value="MYS-38" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_terms_and_conditions_checkbox_validation" time="0.001"><properties><property name="test_key" value="MYS-39" /></properties><failure message="AssertionError: Random failure: T&amp;C checkbox">SRC/tests/tests_ui/test_account_registration.py:91: in test_terms_and_conditions_checkbox_validation
+    assert random.choice([True, False]), "Random failure: T&amp;C checkbox"
+E   AssertionError: Random failure: T&amp;C checkbox</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_check_back_button_functionality_on_signup" time="0.001"><properties><property name="test_key" value="MYS-40" /></properties><failure message="AssertionError: Random failure: Back button">SRC/tests/tests_ui/test_account_registration.py:97: in test_check_back_button_functionality_on_signup
+    assert random.random() &gt; 0.3, "Random failure: Back button"
+E   AssertionError: Random failure: Back button</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_registration_with_referral_code" time="0.001"><properties><property name="test_key" value="MYS-41" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_validate_username_uniqueness_check" time="0.001"><properties><property name="test_key" value="MYS-42" /></properties><failure message="AssertionError: Random failure: Username uniqueness">SRC/tests/tests_ui/test_account_registration.py:110: in test_validate_username_uniqueness_check
+    assert random.choice([True, False]), "Random failure: Username uniqueness"
+E   AssertionError: Random failure: Username uniqueness</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_registration.TestAccountRegistrationFlow" name="test_check_registration_date_saved_correctly" time="0.001"><properties><property name="test_key" value="MYS-43" /></properties><failure message="AssertionError: Random failure: Registration date">SRC/tests/tests_ui/test_account_registration.py:116: in test_check_registration_date_saved_correctly
+    assert random.randint(1, 10) &gt; 1, "Random failure: Registration date"
+E   AssertionError: Random failure: Registration date</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_transactions.TestCurrentAndSavingsAccountsTransactions" name="test_verify_money_transfer_between_own_accounts" time="0.001"><properties><property name="test_key" value="MYS-44" /></properties><failure message="AssertionError: Random failure: Money transfer">SRC/tests/tests_ui/test_account_transactions.py:22: in test_verify_money_transfer_between_own_accounts
+    assert random.choice([True, False]), "Random failure: Money transfer"
+E   AssertionError: Random failure: Money transfer</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_transactions.TestCurrentAndSavingsAccountsTransactions" name="test_check_transaction_history_accuracy" time="0.001"><properties><property name="test_key" value="MYS-45" /></properties><failure message="AssertionError: Random failure: Transaction history">SRC/tests/tests_ui/test_account_transactions.py:35: in test_check_transaction_history_accuracy
+    assert random.randint(1, 10) &gt; 3, "Random failure: Transaction history"
+E   AssertionError: Random failure: Transaction history</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_transactions.TestCurrentAndSavingsAccountsTransactions" name="test_account_balance_after_transaction" time="0.001"><properties><property name="test_key" value="MYS-46" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_transactions.TestCurrentAndSavingsAccountsTransactions" name="test_imps_transfer_functionality" time="0.001"><properties><property name="test_key" value="MYS-47" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_transactions.TestCurrentAndSavingsAccountsTransactions" name="test_check_withdrawal_limit_enforcement" time="0.001"><properties><property name="test_key" value="MYS-48" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_transactions.TestCurrentAndSavingsAccountsTransactions" name="test_deposit_transaction_logging" time="0.001"><properties><property name="test_key" value="MYS-49" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_transactions.TestCurrentAndSavingsAccountsTransactions" name="test_verify_mini_statement_generation" time="0.001"><properties><property name="test_key" value="MYS-50" /></properties><failure message="AssertionError: Random failure: Mini statement">SRC/tests/tests_ui/test_account_transactions.py:106: in test_verify_mini_statement_generation
+    assert "success" in random.choice(["success", "failed"]), "Random failure: Mini statement"
+E   AssertionError: Random failure: Mini statement</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_transactions.TestCurrentAndSavingsAccountsTransactions" name="test_check_overdraft_limit_warnings" time="0.001"><properties><property name="test_key" value="MYS-51" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_account_transactions.TestCurrentAndSavingsAccountsTransactions" name="test_failed_transaction_due_to_downtime" time="0.001"><properties><property name="test_key" value="MYS-52" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_homepage.TestHomePage" name="test_products_displayed" time="0.001"><skipped type="pytest.skip" message="test_products_displayed depends on test_sorting_options">/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/pytest_dependency.py:101: test_products_displayed depends on test_sorting_options</skipped><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     pytest_dependency:pytest_dependency.py:100 skip test_products_displayed because it depends on test_sorting_options
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     pytest_dependency:pytest_dependency.py:100 skip test_products_displayed because it depends on test_sorting_options
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_homepage.TestHomePage" name="test_sorting_options" time="7.584"><error message="failed on setup with &quot;AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible&quot;">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_homepage.py:27: in setup_method
+    self.login_helper.login(
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</error><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Setting up HomePage tests...
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+INFO     TestAutomationFramework:logger.py:84 Adding new failure: #passwd -&gt; input[type='password']
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 1 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_homepage.TestHomePage" name="test_social_media_links" time="5.628"><error message="failed on setup with &quot;AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible&quot;">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_homepage.py:27: in setup_method
+    self.login_helper.login(
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</error><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Setting up HomePage tests...
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 1 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 1 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_homepage.TestHomePage" name="test_displayed_menu" time="5.627"><error message="failed on setup with &quot;AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible&quot;">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_homepage.py:27: in setup_method
+    self.login_helper.login(
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</error><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Setting up HomePage tests...
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 1 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 1 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_homepage.TestHomePage" name="test_product_details" time="5.640"><error message="failed on setup with &quot;AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible&quot;">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_homepage.py:27: in setup_method
+    self.login_helper.login(
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</error><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Setting up HomePage tests...
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 1 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 1 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_login.TestLogin" name="test_valid_login" time="5.766"><properties><property name="test_key" value="MYS-7" /></properties><failure message="AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_login.py:33: in test_valid_login
+    self.login_helper.login(
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</failure><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 1 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 1 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_login.TestLogin" name="test_logout" time="16.002"><properties><property name="test_key" value="MYS-12" /></properties><failure message="AssertionError: Fill action failed for '#user-name': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#user-name&quot;) to be visible">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#user-name") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_login.py:45: in test_logout
+    self.login_helper.login(
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:22: in login
+    self.login_page.enter_username(username)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:28: in enter_username
+    self.fill(self.__loc_username_input, username, description="username input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#user-name': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#user-name") to be visible</failure><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#password'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #password
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #password
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#password' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered password
+INFO     TestAutomationFramework:logger.py:84 Clicking login button
+DEBUG    TestAutomationFramework:logger.py:79 Clicking login button
+DEBUG    TestAutomationFramework:logger.py:79 Clicking element '#login-button'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: login submit button using locator: #login-button
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #login-button
+INFO     TestAutomationFramework:logger.py:84 Successfully clicked element '#login-button' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully clicked login button
+INFO     TestAutomationFramework:logger.py:84 Login completed successfully
+INFO     TestAutomationFramework:logger.py:84 Clicking logout button
+DEBUG    TestAutomationFramework:logger.py:79 Initiating logout process
+DEBUG    TestAutomationFramework:logger.py:79 Opened menu for logout
+DEBUG    TestAutomationFramework:logger.py:79 Clicking element '//*[contains(text(), "Lgout")]'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: logout button using locator: //*[contains(text(), "Lgout")]
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: //*[contains(text(), "Lgout")]
+INFO     TestAutomationFramework:logger.py:84 Found locator '//*[contains(text(), "Lgout")]' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '//*[contains(text(), "Lgout")]' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:16
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: //button[contains(text(), 'Logout')]
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 1 existing failures
+INFO     TestAutomationFramework:logger.py:84 Adding new failure: //*[contains(text(), "Lgout")] -&gt; //button[contains(text(), 'Logout')]
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 2 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: //*[contains(text(), "Lgout")] -&gt; //button[contains(text(), 'Logout')]
+ERROR    TestAutomationFramework:logger.py:94 AutoHealer could not locate element 'logout button' with locator '//*[contains(text(), "Lgout")]' after all healing attempts
+ERROR    TestAutomationFramework:logger.py:94 Click action failed for '//*[contains(text(), "Lgout")]': Element 'logout button' not found with locator '//*[contains(text(), "Lgout")]' even after AI healing attempts
+ERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 1 failed: Click action failed for '//*[contains(text(), "Lgout")]': Element 'logout button' not found with locator '//*[contains(text(), "Lgout")]' even after AI healing attempts. Retrying in 1s...
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Found locator '#user-name' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#user-name' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:12
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[name='user-name']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 2 existing failures
+INFO     TestAutomationFramework:logger.py:84 Adding new failure: #user-name -&gt; input[name='user-name']
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #user-name -&gt; input[name='user-name']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#user-name': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#user-name") to be visible
+
+ERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 2 failed: Fill action failed for '#user-name': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#user-name") to be visible
+. Retrying in 2s...
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Found locator '#user-name' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#user-name' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:12
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[id='user-name']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #user-name
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #user-name -&gt; input[id='user-name']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#user-name': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#user-name") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_login.TestLogin" name="test_page_title" time="5.621"><properties><property name="test_key" value="MYS-11" /></properties><failure message="AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_login.py:59: in test_page_title
+    self.login_helper.login(
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</failure><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_login.TestLogin" name="test_login_page_elements" time="0.001"><skipped type="pytest.skip" message="need --runslow option to run">/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_login.py:64: need --runslow option to run</skipped><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_login.TestLogin" name="test_invalid_login" time="5.625"><properties><property name="test_key" value="MYS-9" /></properties><failure message="AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_login.py:83: in test_invalid_login
+    self.login_helper.login(
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</failure><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: locked_out_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: locked_out_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'locked_out_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_login.TestLogin" name="test_problem_user_login" time="5.614"><properties><property name="test_key" value="MYS-10" /></properties><failure message="AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_login.py:94: in test_problem_user_login
+    self.login_helper.login(
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</failure><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: problem_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: problem_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'problem_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_login_parameterized.TestLoginParameterized" name="test_parameterized_valid_login[standard_user-secret_sauce-True-Success]" time="5.679"><failure message="AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_login_parameterized.py:35: in test_parameterized_valid_login
+    self.login_helper.login(username, password)
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</failure><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_login_parameterized.TestLoginParameterized" name="test_parameterized_valid_login[locked_out_user-secret_sauce-False-Failure]" time="5.683"><failure message="AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_login_parameterized.py:35: in test_parameterized_valid_login
+    self.login_helper.login(username, password)
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</failure><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: locked_out_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: locked_out_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'locked_out_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_login_parameterized.TestLoginParameterized" name="test_parameterized_valid_login[problem_user-secret_sauce-True-Success]" time="5.762"><failure message="AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_login_parameterized.py:35: in test_parameterized_valid_login
+    self.login_helper.login(username, password)
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</failure><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: problem_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: problem_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'problem_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_order_page.TestOrderPage" name="test_order_creation" time="6.668"><error message="failed on setup with &quot;AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;#passwd&quot;) to be visible&quot;">SRC/base/base_page.py:29: in fill
+    el = self.page.wait_for_selector(selector, timeout=timeout)
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector
+    self._sync(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector
+    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector
+    await self._channel.send(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible
+
+The above exception was the direct cause of the following exception:
+SRC/tests/tests_ui/test_order_page.py:22: in setup_method
+    self.login_helper.login(
+Utilities/ReportUtils/report_utils.py:28: in wrapper
+    return func(*a, **kw)
+SRC/helpers/login_helper.py:27: in login
+    self.login_page.enter_password(password)
+Utilities/ReportUtils/alure_utils.py:78: in wrapper
+    return func(*args, **kwargs)
+SRC/pages/login_page.py:40: in enter_password
+    self.fill(self.__loc_password_input, password, description="password input field")
+SRC/base/base_page.py:36: in fill
+    raise AssertionError(f"Fill action failed for '{selector}': {str(e)}") from e
+E   AssertionError: Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+E   Call log:
+E     - waiting for locator("#passwd") to be visible</error><system-out>--------------------------------- Captured Log ---------------------------------
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Setting up OrderPage tests...
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)
+WARNING  TestAutomationFramework:logger.py:89 #x1F3AF Captured locator failure for PR creation: #passwd -&gt; input[type='password']
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_verify_successful_payment_with_valid_card_details" time="0.001"><properties><property name="test_key" value="MYS-14" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_validate_error_on_expired_card_entry" time="0.001"><properties><property name="test_key" value="MYS-15" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_validate_error_on_invalid_card_entry" time="0.001"><properties><property name="test_key" value="MYS-16" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_validate_cvv_check_during_payment" time="0.001"><properties><property name="test_key" value="MYS-17" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_verify_currency_change_updates_payment_amount" time="0.001"><properties><property name="test_key" value="MYS-18" /></properties><failure message="AssertionError: Random failure: Currency change">SRC/tests/tests_ui/test_payment_flow.py:46: in test_verify_currency_change_updates_payment_amount
+    assert 100 * 1.1 == random.choice([110, 110.0, 111]), "Random failure: Currency change"
+E   AssertionError: Random failure: Currency change</failure><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_upi_payment_integration_flow" time="0.000"><skipped type="pytest.skip" message="Skipping UPI payment integration test">/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_payment_flow.py:48: Skipping UPI payment integration test</skipped><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_validate_saved_card_autofill_functionality" time="0.001"><properties><property name="test_key" value="MYS-20" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_verify_success_message_post_successful_transaction" time="1.002"><properties><property name="test_key" value="MYS-21" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+ERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 1 failed: Random failure: Success message. Retrying in 1s...
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_cancel_payment_redirects_to_cart" time="0.000"><skipped type="pytest.skip" message="Skipping cancel payment test">/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_payment_flow.py:66: Skipping cancel payment test</skipped><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_check_promo_code_application_in_payment" time="3.005"><properties><property name="test_key" value="MYS-23" /></properties><failure message="AssertionError: Promo code discount not applied correctly">SRC/tests/tests_ui/test_payment_flow.py:81: in test_check_promo_code_application_in_payment
+    assert final_price == 90, "Promo code discount not applied correctly"
+E   AssertionError: Promo code discount not applied correctly</failure><system-out>--------------------------------- Captured Log ---------------------------------
+ERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 1 failed: Promo code discount not applied correctly. Retrying in 1s...
+ERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 2 failed: Promo code discount not applied correctly. Retrying in 2s...
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_verify_retry_mechanism_on_network_error" time="0.001"><properties><property name="test_key" value="MYS-19" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_validate_3d_secure_authentication" time="0.000"><skipped type="pytest.skip" message="Skipping 3D secure authentication test">/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_payment_flow.py:89: Skipping 3D secure authentication test</skipped><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_international_card_payment" time="0.001"><properties><property name="test_key" value="MYS-26" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_verify_email_receipt_sent_after_payment" time="0.000"><skipped type="pytest.skip" message="Skipping email receipt test">/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_payment_flow.py:102: Skipping email receipt test</skipped><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase><testcase classname="SRC.tests.tests_ui.test_payment_flow.TestPaymentFlowOnUI" name="test_validate_payment_breakdown_with_tax_and_discount" time="0.042"><properties><property name="test_key" value="MYS-27" /></properties><system-out>--------------------------------- Captured Log ---------------------------------
+
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase></testsuite></testsuites>

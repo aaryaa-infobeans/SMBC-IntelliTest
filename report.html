@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title id="head-title">report.html</title>
+      <style type="text/css">body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  /* do not increase min-width as some may use split screens */
+  min-width: 800px;
+  color: #999;
+}
+
+h1 {
+  font-size: 24px;
+  color: black;
+}
+
+h2 {
+  font-size: 16px;
+  color: black;
+}
+
+p {
+  color: black;
+}
+
+a {
+  color: #999;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+/******************************
+ * SUMMARY INFORMATION
+ ******************************/
+#environment td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  vertical-align: top;
+}
+#environment tr:nth-child(odd) {
+  background-color: #f6f6f6;
+}
+#environment ul {
+  margin: 0;
+  padding: 0 20px;
+}
+
+/******************************
+ * TEST RESULT COLORS
+ ******************************/
+span.passed,
+.passed .col-result {
+  color: green;
+}
+
+span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
+  color: orange;
+}
+
+span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
+  color: red;
+}
+
+.col-links__extra {
+  margin-right: 3px;
+}
+
+/******************************
+ * RESULTS TABLE
+ *
+ * 1. Table Layout
+ * 2. Extra
+ * 3. Sorting items
+ *
+ ******************************/
+/*------------------
+ * 1. Table Layout
+ *------------------*/
+#results-table {
+  border: 1px solid #e6e6e6;
+  color: #999;
+  font-size: 12px;
+  width: 100%;
+}
+#results-table th,
+#results-table td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  text-align: left;
+}
+#results-table th {
+  font-weight: bold;
+}
+
+/*------------------
+ * 2. Extra
+ *------------------*/
+.logwrapper {
+  max-height: 230px;
+  overflow-y: scroll;
+  background-color: #e6e6e6;
+}
+.logwrapper.expanded {
+  max-height: none;
+}
+.logwrapper.expanded .logexpander:after {
+  content: "collapse [-]";
+}
+.logwrapper .logexpander {
+  z-index: 1;
+  position: sticky;
+  top: 10px;
+  width: max-content;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 5px 7px;
+  margin: 10px 0 10px calc(100% - 80px);
+  cursor: pointer;
+  background-color: #e6e6e6;
+}
+.logwrapper .logexpander:after {
+  content: "expand [+]";
+}
+.logwrapper .logexpander:hover {
+  color: #000;
+  border-color: #000;
+}
+.logwrapper .log {
+  min-height: 40px;
+  position: relative;
+  top: -50px;
+  height: calc(100% + 50px);
+  border: 1px solid #e6e6e6;
+  color: black;
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  padding: 5px;
+  padding-right: 80px;
+  white-space: pre-wrap;
+}
+
+div.media {
+  border: 1px solid #e6e6e6;
+  float: right;
+  height: 240px;
+  margin: 0 5px;
+  overflow: hidden;
+  width: 320px;
+}
+
+.media-container {
+  display: grid;
+  grid-template-columns: 25px auto 25px;
+  align-items: center;
+  flex: 1 1;
+  overflow: hidden;
+  height: 200px;
+}
+
+.media-container--fullscreen {
+  grid-template-columns: 0px auto 0px;
+}
+
+.media-container__nav--right,
+.media-container__nav--left {
+  text-align: center;
+  cursor: pointer;
+}
+
+.media-container__viewport {
+  cursor: pointer;
+  text-align: center;
+  height: inherit;
+}
+.media-container__viewport img,
+.media-container__viewport video {
+  object-fit: cover;
+  width: 100%;
+  max-height: 100%;
+}
+
+.media__name,
+.media__counter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex: 0 0 25px;
+  align-items: center;
+}
+
+.collapsible td:not(.col-links) {
+  cursor: pointer;
+}
+.collapsible td:not(.col-links):hover::after {
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.col-result {
+  width: 130px;
+}
+.col-result:hover::after {
+  content: " (hide details)";
+}
+
+.col-result.collapsed:hover::after {
+  content: " (show details)";
+}
+
+#environment-header h2:hover::after {
+  content: " (hide details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#environment-header.collapsed h2:hover::after {
+  content: " (show details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/*------------------
+ * 3. Sorting items
+ *------------------*/
+.sortable {
+  cursor: pointer;
+}
+.sortable.desc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: -12.5px;
+  border: 10px solid #4caf50;
+  border-bottom: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.sortable.asc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: 12.5px;
+  border: 10px solid #4caf50;
+  border-top: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+
+.hidden, .summary__reload__button.hidden {
+  display: none;
+}
+
+.summary__data {
+  flex: 0 0 550px;
+}
+.summary__reload {
+  flex: 1 1;
+  display: flex;
+  justify-content: center;
+}
+.summary__reload__button {
+  flex: 0 0 300px;
+  display: flex;
+  color: white;
+  font-weight: bold;
+  background-color: #4caf50;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.summary__reload__button:hover {
+  background-color: #46a049;
+}
+.summary__spacer {
+  flex: 0 0 550px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.filters,
+.collapse {
+  display: flex;
+  align-items: center;
+}
+.filters button,
+.collapse button {
+  color: #999;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.filters button:hover,
+.collapse button:hover {
+  color: #ccc;
+}
+
+.filter__label {
+  margin-right: 10px;
+}
+
+      </style>
+    
+  </head>
+  <body>
+    <h1 id="title">report.html</h1>
+    <p>Report generated on 29-Sep-2025 at 15:56:17 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
+        v4.1.1</p>
+    <div id="environment-header">
+      <h2>Environment</h2>
+    </div>
+    <table id="environment"></table>
+    <!-- TEMPLATES -->
+      <template id="template_environment_row">
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+    </template>
+    <template id="template_results-table__body--empty">
+      <tbody class="results-table-row">
+        <tr id="not-found-message">
+          <td colspan="4">No results found. Check the filters.</th>
+        </tr>
+    </template>
+    <template id="template_results-table__tbody">
+      <tbody class="results-table-row">
+        <tr class="collapsible">
+        </tr>
+        <tr class="extras-row">
+          <td class="extra" colspan="4">
+            <div class="extraHTML"></div>
+            <div class="media">
+              <div class="media-container">
+                  <div class="media-container__nav--left"><</div>
+                  <div class="media-container__viewport">
+                    <img src="" />
+                    <video controls>
+                      <source src="" type="video/mp4">
+                    </video>
+                  </div>
+                  <div class="media-container__nav--right">></div>
+                </div>
+                <div class="media__name"></div>
+                <div class="media__counter"></div>
+            </div>
+            <div class="logwrapper">
+              <div class="logexpander"></div>
+              <div class="log"></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </template>
+    <!-- END TEMPLATES -->
+    <div class="summary">
+      <div class="summary__data">
+        <h2>Summary</h2>
+        <div class="additional-summary prefix">
+        </div>
+        <p class="run-count">46 tests took 00:01:32.</p>
+        <p class="filter">(Un)check the boxes to filter the results.</p>
+        <div class="summary__reload">
+          <div class="summary__reload__button hidden" onclick="location.reload()">
+            <div>There are still tests running. <br />Reload this page to get the latest results!</div>
+          </div>
+        </div>
+        <div class="summary__spacer"></div>
+        <div class="controls">
+          <div class="filters">
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="failed" />
+            <span class="failed">21 Failed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="passed" />
+            <span class="passed">25 Passed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="skipped" />
+            <span class="skipped">7 Skipped,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xfailed" disabled/>
+            <span class="xfailed">0 Expected failures,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xpassed" disabled/>
+            <span class="xpassed">0 Unexpected passes,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="error" />
+            <span class="error">5 Errors,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="rerun" disabled/>
+            <span class="rerun">0 Reruns</span>
+          </div>
+          <div class="collapse">
+            <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide all details</button>
+          </div>
+        </div>
+      </div>
+      <div class="additional-summary summary">
+      </div>
+      <div class="additional-summary postfix">
+      </div>
+    </div>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable" data-column-type="result">Result</th>
+          <th class="sortable" data-column-type="testId">Test</th>
+          <th class="sortable" data-column-type="duration">Duration</th>
+          <th>Links</th>
+        </tr>
+      </thead>
+    </table>
+  </body>
+  <footer>
+    <div id="data-container" data-jsonblob="{&#34;environment&#34;: {&#34;Python&#34;: &#34;3.10.18&#34;, &#34;Platform&#34;: &#34;Linux-6.11.0-1018-azure-x86_64-with-glibc2.39&#34;, &#34;Packages&#34;: {&#34;pytest&#34;: &#34;8.2.0&#34;, &#34;pluggy&#34;: &#34;1.6.0&#34;}, &#34;Plugins&#34;: {&#34;anyio&#34;: &#34;4.11.0&#34;, &#34;html&#34;: &#34;4.1.1&#34;, &#34;cov&#34;: &#34;6.0.0&#34;, &#34;base-url&#34;: &#34;2.1.0&#34;, &#34;Faker&#34;: &#34;37.6.0&#34;, &#34;json-report&#34;: &#34;1.5.0&#34;, &#34;jira-xray&#34;: &#34;0.9.2&#34;, &#34;allure-pytest&#34;: &#34;2.15.0&#34;, &#34;xdist&#34;: &#34;3.6.0&#34;, &#34;playwright&#34;: &#34;0.7.1&#34;, &#34;rerunfailures&#34;: &#34;13.0&#34;, &#34;metadata&#34;: &#34;3.1.1&#34;, &#34;dependency&#34;: &#34;0.6.0&#34;}, &#34;CI&#34;: &#34;true&#34;, &#34;JAVA_HOME&#34;: &#34;/usr/lib/jvm/temurin-17-jdk-amd64&#34;, &#34;Base URL&#34;: &#34;&#34;}, &#34;tests&#34;: {&#34;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_booker_api&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_booker_api&#34;, &#34;duration&#34;: &#34;268 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_booker_api&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;268 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Session created successfully\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Session created successfully\nINFO     TestAutomationFramework:logger.py:84 Making POST request to /auth, with kwargs: {&amp;#x27;headers&amp;#x27;: {&amp;#x27;Content-Type&amp;#x27;: &amp;#x27;application/json&amp;#x27;}, &amp;#x27;data&amp;#x27;: &amp;#x27;{&amp;quot;username&amp;quot;: &amp;quot;admin&amp;quot;, &amp;quot;password&amp;quot;: &amp;quot;password123&amp;quot;}&amp;#x27;, &amp;#x27;timeout&amp;#x27;: 30}\nINFO     TestAutomationFramework:logger.py:84 POST request made successfully: 200\nINFO     TestAutomationFramework:logger.py:84 Request time taken by __post_request: 0.26102781295776367\nINFO     TestAutomationFramework:logger.py:84 Request made successfully: 200\nINFO     TestAutomationFramework:logger.py:84 Session closed successfully\nINFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0001811981201171875\n\n---------------------------- Captured log teardown -----------------------------\nINFO     TestAutomationFramework:logger.py:84 Session closed successfully\nINFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.00023031234741210938&#34;}], &#34;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_create_booking&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_create_booking&#34;, &#34;duration&#34;: &#34;223 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_create_booking&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;223 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Session created successfully\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Making POST request to /booking, with kwargs: {&amp;#x27;data&amp;#x27;: &amp;#x27;{&amp;quot;firstname&amp;quot;: &amp;quot;April&amp;quot;, &amp;quot;lastname&amp;quot;: &amp;quot;Allen&amp;quot;, &amp;quot;totalprice&amp;quot;: 7762, &amp;quot;depositpaid&amp;quot;: true, &amp;quot;bookingdates&amp;quot;: {&amp;quot;checkin&amp;quot;: &amp;quot;1980-11-23&amp;quot;, &amp;quot;checkout&amp;quot;: &amp;quot;2018-06-29&amp;quot;}, &amp;quot;additionalneeds&amp;quot;: &amp;quot;Throw have fact begin. Particularly I along despite everybody.\\\\nPick cause chair fly. Dog this particularly in movement TV take himself. Line send feeling table trial college.&amp;quot;}&amp;#x27;, &amp;#x27;timeout&amp;#x27;: 30}\nINFO     TestAutomationFramework:logger.py:84 POST request made successfully: 200\nINFO     TestAutomationFramework:logger.py:84 Request time taken by __post_request: 0.2181565761566162\nINFO     TestAutomationFramework:logger.py:84 Request made successfully: 200\nINFO     TestAutomationFramework:logger.py:84 Booking ID: 2222\n\n---------------------------- Captured log teardown -----------------------------\nINFO     TestAutomationFramework:logger.py:84 Session closed successfully\nINFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0013477802276611328&#34;}], &#34;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_get_booking&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_get_booking&#34;, &#34;duration&#34;: &#34;331 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_get_booking&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;331 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Session created successfully\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Making GET request to /booking, with kwargs: {&amp;#x27;timeout&amp;#x27;: 30}\nINFO     TestAutomationFramework:logger.py:84 GET request made successfully: 200\nINFO     TestAutomationFramework:logger.py:84 Request time taken by __get_request: 0.326585054397583\nINFO     TestAutomationFramework:logger.py:84 Request made successfully: 200\n\n---------------------------- Captured log teardown -----------------------------\nINFO     TestAutomationFramework:logger.py:84 Session closed successfully\nINFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0013585090637207031&#34;}], &#34;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_update_booking&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_update_booking&#34;, &#34;duration&#34;: &#34;227 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_api/test_bookers_api.py::TestBookersApi::test_update_booking&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;227 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Session created successfully\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Updating the booking with Booking ID: 2222\nINFO     TestAutomationFramework:logger.py:84 Making PUT request to /booking/2222, with kwargs: {&amp;#x27;timeout&amp;#x27;: 30, &amp;#x27;data&amp;#x27;: &amp;#x27;{&amp;quot;firstname&amp;quot;: &amp;quot;James&amp;quot;, &amp;quot;lastname&amp;quot;: &amp;quot;Brown&amp;quot;, &amp;quot;totalprice&amp;quot;: 111, &amp;quot;depositpaid&amp;quot;: true, &amp;quot;bookingdates&amp;quot;: {&amp;quot;checkin&amp;quot;: &amp;quot;2018-01-01&amp;quot;, &amp;quot;checkout&amp;quot;: &amp;quot;2019-01-01&amp;quot;}, &amp;quot;additionalneeds&amp;quot;: &amp;quot;Breakfast&amp;quot;}&amp;#x27;}\nINFO     TestAutomationFramework:logger.py:84 PUT request made successfully: 200\nINFO     TestAutomationFramework:logger.py:84 Request time taken by __put_request: 0.22283458709716797\nINFO     TestAutomationFramework:logger.py:84 Request made successfully: 200\n\n---------------------------- Captured log teardown -----------------------------\nINFO     TestAutomationFramework:logger.py:84 Session closed successfully\nINFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0013477802276611328&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_verify_successful_registration_with_valid_data&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_verify_successful_registration_with_valid_data&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_verify_successful_registration_with_valid_data&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py:20: in test_verify_successful_registration_with_valid_data\n    self.login_helper.login(\nE   AttributeError: &amp;#x27;TestAccountRegistrationFlow&amp;#x27; object has no attribute &amp;#x27;login_helper&amp;#x27;\n&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_validate_error_for_duplicate_email_registration&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_validate_error_for_duplicate_email_registration&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_validate_error_for_duplicate_email_registration&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_password_strength_validation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Skipped&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_password_strength_validation::setup&#34;, &#34;duration&#34;: &#34;0 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Skipped&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_password_strength_validation::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;0 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;(&amp;#x27;/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_account_registration.py&amp;#x27;, 32, &amp;#x27;Skipped: Skipping OTP verification test&amp;#x27;)\n&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_otp_verification_during_registration&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_otp_verification_during_registration&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_otp_verification_during_registration&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py:47: in test_check_otp_verification_during_registration\n    assert random.choice([True, False]), &amp;quot;Random failure: OTP verification&amp;quot;\nE   AssertionError: Random failure: OTP verification\n&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_verify_mandatory_fields_are_enforced&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_verify_mandatory_fields_are_enforced&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_verify_mandatory_fields_are_enforced&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_social_media_registration_google_facebook&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_social_media_registration_google_facebook&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_social_media_registration_google_facebook&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py:58: in test_social_media_registration_google_facebook\n    assert random.choice([&amp;quot;google&amp;quot;, &amp;quot;facebook&amp;quot;]) == &amp;quot;google&amp;quot;, &amp;quot;Random failure: Social media registration&amp;quot;\nE   AssertionError: Random failure: Social media registration\n&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_mobile_number_verification&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_mobile_number_verification&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_mobile_number_verification&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_validate_error_for_invalid_email_format&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_validate_error_for_invalid_email_format&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_validate_error_for_invalid_email_format&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_verify_email_confirmation_sent_post_registration&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_verify_email_confirmation_sent_post_registration&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_verify_email_confirmation_sent_post_registration&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py:79: in test_verify_email_confirmation_sent_post_registration\n    assert random.choice([True, False]), &amp;quot;Random failure: Email confirmation&amp;quot;\nE   AssertionError: Random failure: Email confirmation\n&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_redirection_to_dashboard_post_signup&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_redirection_to_dashboard_post_signup&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_redirection_to_dashboard_post_signup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_terms_and_conditions_checkbox_validation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_terms_and_conditions_checkbox_validation&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_terms_and_conditions_checkbox_validation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py:91: in test_terms_and_conditions_checkbox_validation\n    assert random.choice([True, False]), &amp;quot;Random failure: T&amp;amp;C checkbox&amp;quot;\nE   AssertionError: Random failure: T&amp;amp;C checkbox\n&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_back_button_functionality_on_signup&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_back_button_functionality_on_signup&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_back_button_functionality_on_signup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py:97: in test_check_back_button_functionality_on_signup\n    assert random.random() &amp;gt; 0.3, &amp;quot;Random failure: Back button&amp;quot;\nE   AssertionError: Random failure: Back button\n&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_registration_with_referral_code&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_registration_with_referral_code&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_registration_with_referral_code&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_validate_username_uniqueness_check&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_validate_username_uniqueness_check&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_validate_username_uniqueness_check&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py:110: in test_validate_username_uniqueness_check\n    assert random.choice([True, False]), &amp;quot;Random failure: Username uniqueness&amp;quot;\nE   AssertionError: Random failure: Username uniqueness\n&#34;}], &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_registration_date_saved_correctly&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_registration_date_saved_correctly&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_registration.py::TestAccountRegistrationFlow::test_check_registration_date_saved_correctly&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_account_registration.py:116: in test_check_registration_date_saved_correctly\n    assert random.randint(1, 10) &amp;gt; 1, &amp;quot;Random failure: Registration date&amp;quot;\nE   AssertionError: Random failure: Registration date\n&#34;}], &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_verify_money_transfer_between_own_accounts&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_verify_money_transfer_between_own_accounts&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_verify_money_transfer_between_own_accounts&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py:22: in test_verify_money_transfer_between_own_accounts\n    assert random.choice([True, False]), &amp;quot;Random failure: Money transfer&amp;quot;\nE   AssertionError: Random failure: Money transfer\n&#34;}], &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_check_transaction_history_accuracy&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_check_transaction_history_accuracy&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_check_transaction_history_accuracy&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py:35: in test_check_transaction_history_accuracy\n    assert random.randint(1, 10) &amp;gt; 3, &amp;quot;Random failure: Transaction history&amp;quot;\nE   AssertionError: Random failure: Transaction history\n&#34;}], &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_account_balance_after_transaction&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_account_balance_after_transaction&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_account_balance_after_transaction&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_imps_transfer_functionality&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_imps_transfer_functionality&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_imps_transfer_functionality&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_check_withdrawal_limit_enforcement&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_check_withdrawal_limit_enforcement&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_check_withdrawal_limit_enforcement&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_deposit_transaction_logging&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_deposit_transaction_logging&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_deposit_transaction_logging&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_verify_mini_statement_generation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_verify_mini_statement_generation&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_verify_mini_statement_generation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py:106: in test_verify_mini_statement_generation\n    assert &amp;quot;success&amp;quot; in random.choice([&amp;quot;success&amp;quot;, &amp;quot;failed&amp;quot;]), &amp;quot;Random failure: Mini statement&amp;quot;\nE   AssertionError: Random failure: Mini statement\n&#34;}], &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_check_overdraft_limit_warnings&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_check_overdraft_limit_warnings&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_check_overdraft_limit_warnings&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_failed_transaction_due_to_downtime&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_failed_transaction_due_to_downtime&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_account_transactions.py::TestCurrentAndSavingsAccountsTransactions::test_failed_transaction_due_to_downtime&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_products_displayed&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Skipped&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_products_displayed::setup&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Skipped&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_products_displayed::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;(&amp;#x27;/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/pytest_dependency.py&amp;#x27;, 101, &amp;#x27;Skipped: test_products_displayed depends on test_sorting_options&amp;#x27;)\n\n------------------------------ Captured log setup ------------------------------\nINFO     pytest_dependency:pytest_dependency.py:100 skip test_products_displayed because it depends on test_sorting_options\n&#34;}], &#34;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_sorting_options&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Error&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_sorting_options::setup&#34;, &#34;duration&#34;: &#34;00:00:08&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Error&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_sorting_options::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:08&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_homepage.py:27: in setup_method\n    self.login_helper.login(\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\nINFO     TestAutomationFramework:logger.py:84 Setting up HomePage tests...\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;standard_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nINFO     TestAutomationFramework:logger.py:84 Adding new failure: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 1 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_social_media_links&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Error&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_social_media_links::setup&#34;, &#34;duration&#34;: &#34;00:00:06&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Error&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_social_media_links::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:06&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_homepage.py:27: in setup_method\n    self.login_helper.login(\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\nINFO     TestAutomationFramework:logger.py:84 Setting up HomePage tests...\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;standard_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 1 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 1 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_displayed_menu&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Error&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_displayed_menu::setup&#34;, &#34;duration&#34;: &#34;00:00:06&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Error&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_displayed_menu::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:06&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_homepage.py:27: in setup_method\n    self.login_helper.login(\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\nINFO     TestAutomationFramework:logger.py:84 Setting up HomePage tests...\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;standard_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 1 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 1 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_product_details&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Error&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_product_details::setup&#34;, &#34;duration&#34;: &#34;00:00:06&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Error&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_homepage.py::TestHomePage::test_product_details::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:06&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_homepage.py:27: in setup_method\n    self.login_helper.login(\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\nINFO     TestAutomationFramework:logger.py:84 Setting up HomePage tests...\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;standard_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 1 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 1 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_valid_login&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_valid_login&#34;, &#34;duration&#34;: &#34;00:00:06&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_login.py::TestLogin::test_valid_login&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:06&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_login.py:33: in test_valid_login\n    self.login_helper.login(\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;standard_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 1 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 1 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_logout&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_logout&#34;, &#34;duration&#34;: &#34;00:00:16&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_login.py::TestLogin::test_logout&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:16&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#user-name&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_login.py:45: in test_logout\n    self.login_helper.login(\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:22: in login\n    self.login_page.enter_username(username)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:28: in enter_username\n    self.fill(self.__loc_username_input, username, description=&amp;quot;username input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#user-name&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#user-name&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;standard_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#password&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #password\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #password\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#password&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered password\nINFO     TestAutomationFramework:logger.py:84 Clicking login button\nDEBUG    TestAutomationFramework:logger.py:79 Clicking login button\nDEBUG    TestAutomationFramework:logger.py:79 Clicking element &amp;#x27;#login-button&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: login submit button using locator: #login-button\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #login-button\nINFO     TestAutomationFramework:logger.py:84 Successfully clicked element &amp;#x27;#login-button&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully clicked login button\nINFO     TestAutomationFramework:logger.py:84 Login completed successfully\nINFO     TestAutomationFramework:logger.py:84 Clicking logout button\nDEBUG    TestAutomationFramework:logger.py:79 Initiating logout process\nDEBUG    TestAutomationFramework:logger.py:79 Opened menu for logout\nDEBUG    TestAutomationFramework:logger.py:79 Clicking element &amp;#x27;//*[contains(text(), &amp;quot;Lgout&amp;quot;)]&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: logout button using locator: //*[contains(text(), &amp;quot;Lgout&amp;quot;)]\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: //*[contains(text(), &amp;quot;Lgout&amp;quot;)]\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;//*[contains(text(), &amp;quot;Lgout&amp;quot;)]&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;//*[contains(text(), &amp;quot;Lgout&amp;quot;)]&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:16\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: //button[contains(text(), &amp;#x27;Logout&amp;#x27;)]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 1 existing failures\nINFO     TestAutomationFramework:logger.py:84 Adding new failure: //*[contains(text(), &amp;quot;Lgout&amp;quot;)] -&amp;gt; //button[contains(text(), &amp;#x27;Logout&amp;#x27;)]\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 2 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: //*[contains(text(), &amp;quot;Lgout&amp;quot;)] -&amp;gt; //button[contains(text(), &amp;#x27;Logout&amp;#x27;)]\nERROR    TestAutomationFramework:logger.py:94 AutoHealer could not locate element &amp;#x27;logout button&amp;#x27; with locator &amp;#x27;//*[contains(text(), &amp;quot;Lgout&amp;quot;)]&amp;#x27; after all healing attempts\nERROR    TestAutomationFramework:logger.py:94 Click action failed for &amp;#x27;//*[contains(text(), &amp;quot;Lgout&amp;quot;)]&amp;#x27;: Element &amp;#x27;logout button&amp;#x27; not found with locator &amp;#x27;//*[contains(text(), &amp;quot;Lgout&amp;quot;)]&amp;#x27; even after AI healing attempts\nERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 1 failed: Click action failed for &amp;#x27;//*[contains(text(), &amp;quot;Lgout&amp;quot;)]&amp;#x27;: Element &amp;#x27;logout button&amp;#x27; not found with locator &amp;#x27;//*[contains(text(), &amp;quot;Lgout&amp;quot;)]&amp;#x27; even after AI healing attempts. Retrying in 1s...\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;standard_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#user-name&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#user-name&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:12\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[name=&amp;#x27;user-name&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 2 existing failures\nINFO     TestAutomationFramework:logger.py:84 Adding new failure: #user-name -&amp;gt; input[name=&amp;#x27;user-name&amp;#x27;]\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #user-name -&amp;gt; input[name=&amp;#x27;user-name&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#user-name&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#user-name&amp;quot;) to be visible\n\nERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 2 failed: Fill action failed for &amp;#x27;#user-name&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#user-name&amp;quot;) to be visible\n. Retrying in 2s...\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;standard_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#user-name&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#user-name&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:12\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[id=&amp;#x27;user-name&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #user-name\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #user-name -&amp;gt; input[id=&amp;#x27;user-name&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#user-name&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#user-name&amp;quot;) to be visible\n\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_page_title&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_page_title&#34;, &#34;duration&#34;: &#34;00:00:06&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_login.py::TestLogin::test_page_title&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:06&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_login.py:59: in test_page_title\n    self.login_helper.login(\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;standard_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_login_page_elements&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Skipped&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_login_page_elements::setup&#34;, &#34;duration&#34;: &#34;0 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Skipped&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_login.py::TestLogin::test_login_page_elements::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;0 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;(&amp;#x27;/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_login.py&amp;#x27;, 64, &amp;#x27;Skipped: need --runslow option to run&amp;#x27;)\n&#34;}], &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_invalid_login&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_invalid_login&#34;, &#34;duration&#34;: &#34;00:00:06&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_login.py::TestLogin::test_invalid_login&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:06&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_login.py:83: in test_invalid_login\n    self.login_helper.login(\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: locked_out_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: locked_out_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;locked_out_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_problem_user_login&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_login.py::TestLogin::test_problem_user_login&#34;, &#34;duration&#34;: &#34;00:00:06&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_login.py::TestLogin::test_problem_user_login&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:06&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_login.py:94: in test_problem_user_login\n    self.login_helper.login(\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: problem_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: problem_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;problem_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_login_parameterized.py::TestLoginParameterized::test_parameterized_valid_login[standard_user-secret_sauce-True-Success]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_login_parameterized.py::TestLoginParameterized::test_parameterized_valid_login[standard_user-secret_sauce-True-Success]&#34;, &#34;duration&#34;: &#34;00:00:06&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_login_parameterized.py::TestLoginParameterized::test_parameterized_valid_login[standard_user-secret_sauce-True-Success]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:06&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_login_parameterized.py:35: in test_parameterized_valid_login\n    self.login_helper.login(username, password)\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;standard_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_login_parameterized.py::TestLoginParameterized::test_parameterized_valid_login[locked_out_user-secret_sauce-False-Failure]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_login_parameterized.py::TestLoginParameterized::test_parameterized_valid_login[locked_out_user-secret_sauce-False-Failure]&#34;, &#34;duration&#34;: &#34;00:00:06&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_login_parameterized.py::TestLoginParameterized::test_parameterized_valid_login[locked_out_user-secret_sauce-False-Failure]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:06&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_login_parameterized.py:35: in test_parameterized_valid_login\n    self.login_helper.login(username, password)\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: locked_out_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: locked_out_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;locked_out_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_login_parameterized.py::TestLoginParameterized::test_parameterized_valid_login[problem_user-secret_sauce-True-Success]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_login_parameterized.py::TestLoginParameterized::test_parameterized_valid_login[problem_user-secret_sauce-True-Success]&#34;, &#34;duration&#34;: &#34;00:00:06&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_login_parameterized.py::TestLoginParameterized::test_parameterized_valid_login[problem_user-secret_sauce-True-Success]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:06&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_login_parameterized.py:35: in test_parameterized_valid_login\n    self.login_helper.login(username, password)\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\n\n------------------------------ Captured log call -------------------------------\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: problem_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: problem_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;problem_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_order_page.py::TestOrderPage::test_order_creation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Error&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_order_page.py::TestOrderPage::test_order_creation::setup&#34;, &#34;duration&#34;: &#34;00:00:07&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Error&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_order_page.py::TestOrderPage::test_order_creation::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:07&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/base/base_page.py:29: in fill\n    el = self.page.wait_for_selector(selector, timeout=timeout)\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/sync_api/_generated.py:8182: in wait_for_selector\n    self._sync(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_page.py:423: in wait_for_selector\n    return await self._main_frame.wait_for_selector(**locals_to_params(locals()))\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_frame.py:369: in wait_for_selector\n    await self._channel.send(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:69: in send\n    return await self._connection.wrap_api_call(\n/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call\n    raise rewrite_error(error, f&amp;quot;{parsed_st[&amp;#x27;apiName&amp;#x27;]}: {error}&amp;quot;) from None\nE   playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\nThe above exception was the direct cause of the following exception:\nSRC/tests/tests_ui/test_order_page.py:22: in setup_method\n    self.login_helper.login(\nUtilities/ReportUtils/report_utils.py:28: in wrapper\n    return func(*a, **kw)\nSRC/helpers/login_helper.py:27: in login\n    self.login_page.enter_password(password)\nUtilities/ReportUtils/alure_utils.py:78: in wrapper\n    return func(*args, **kwargs)\nSRC/pages/login_page.py:40: in enter_password\n    self.fill(self.__loc_password_input, password, description=&amp;quot;password input field&amp;quot;)\nSRC/base/base_page.py:36: in fill\n    raise AssertionError(f&amp;quot;Fill action failed for &amp;#x27;{selector}&amp;#x27;: {str(e)}&amp;quot;) from e\nE   AssertionError: Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nE   Call log:\nE     - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n\n------------------------------ Captured log setup ------------------------------\nINFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/\nDEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nINFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration\nDEBUG    TestAutomationFramework:logger.py:79 Test base setup completed\nINFO     TestAutomationFramework:logger.py:84 Setting up OrderPage tests...\nINFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;standard_user&amp;#x27; to element &amp;#x27;#user-name&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name\nINFO     TestAutomationFramework:logger.py:84 Successfully filled element &amp;#x27;#user-name&amp;#x27; using AutoHealer\nINFO     TestAutomationFramework:logger.py:84 Successfully entered username\nINFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...\nDEBUG    TestAutomationFramework:logger.py:79 Entering password\nDEBUG    TestAutomationFramework:logger.py:79 Entering text:&amp;#x27;secret_sauce&amp;#x27; to element &amp;#x27;#passwd&amp;#x27;\nINFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd\nWARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py\nINFO     TestAutomationFramework:logger.py:84 Found locator &amp;#x27;#passwd&amp;#x27; declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13\nINFO     TestAutomationFramework:logger.py:84 Requesting alternative_locator from OpenAI\nINFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview &amp;quot;HTTP/1.1 200 OK&amp;quot;\nINFO     TestAutomationFramework:logger.py:84 OpenAI suggested locator: input[type=&amp;#x27;password&amp;#x27;]\nDEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures\nINFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd\nINFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)\nWARNING  TestAutomationFramework:logger.py:89 \ud83c\udfaf Captured locator failure for PR creation: #passwd -&amp;gt; input[type=&amp;#x27;password&amp;#x27;]\nERROR    TestAutomationFramework:logger.py:94 Fill action failed for &amp;#x27;#passwd&amp;#x27;: Page.wait_for_selector: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator(&amp;quot;#passwd&amp;quot;) to be visible\n---------------------------- Captured log teardown -----------------------------\nDEBUG    TestAutomationFramework:logger.py:79 Closing browser page&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_successful_payment_with_valid_card_details&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_successful_payment_with_valid_card_details&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_successful_payment_with_valid_card_details&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_error_on_expired_card_entry&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_error_on_expired_card_entry&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_error_on_expired_card_entry&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_error_on_invalid_card_entry&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_error_on_invalid_card_entry&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_error_on_invalid_card_entry&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_cvv_check_during_payment&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_cvv_check_during_payment&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_cvv_check_during_payment&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_currency_change_updates_payment_amount&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_currency_change_updates_payment_amount&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_currency_change_updates_payment_amount&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py:46: in test_verify_currency_change_updates_payment_amount\n    assert 100 * 1.1 == random.choice([110, 110.0, 111]), &amp;quot;Random failure: Currency change&amp;quot;\nE   AssertionError: Random failure: Currency change\n&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_upi_payment_integration_flow&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Skipped&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_upi_payment_integration_flow::setup&#34;, &#34;duration&#34;: &#34;0 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Skipped&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_upi_payment_integration_flow::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;0 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;(&amp;#x27;/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_payment_flow.py&amp;#x27;, 48, &amp;#x27;Skipped: Skipping UPI payment integration test&amp;#x27;)\n&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_saved_card_autofill_functionality&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_saved_card_autofill_functionality&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_saved_card_autofill_functionality&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_success_message_post_successful_transaction&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_success_message_post_successful_transaction&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_success_message_post_successful_transaction&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;------------------------------ Captured log call -------------------------------\nERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 1 failed: Random failure: Success message. Retrying in 1s...\n\n&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_cancel_payment_redirects_to_cart&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Skipped&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_cancel_payment_redirects_to_cart::setup&#34;, &#34;duration&#34;: &#34;0 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Skipped&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_cancel_payment_redirects_to_cart::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;0 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;(&amp;#x27;/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_payment_flow.py&amp;#x27;, 66, &amp;#x27;Skipped: Skipping cancel payment test&amp;#x27;)\n&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_check_promo_code_application_in_payment&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_check_promo_code_application_in_payment&#34;, &#34;duration&#34;: &#34;00:00:03&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_check_promo_code_application_in_payment&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:03&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py:81: in test_check_promo_code_application_in_payment\n    assert final_price == 90, &amp;quot;Promo code discount not applied correctly&amp;quot;\nE   AssertionError: Promo code discount not applied correctly\n\n------------------------------ Captured log call -------------------------------\nERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 1 failed: Promo code discount not applied correctly. Retrying in 1s...\nERROR    TestAutomationFramework:logger.py:94 [Retry] Attempt 2 failed: Promo code discount not applied correctly. Retrying in 2s...\n\n&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_retry_mechanism_on_network_error&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_retry_mechanism_on_network_error&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_retry_mechanism_on_network_error&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_3d_secure_authentication&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Skipped&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_3d_secure_authentication::setup&#34;, &#34;duration&#34;: &#34;0 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Skipped&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_3d_secure_authentication::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;0 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;(&amp;#x27;/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_payment_flow.py&amp;#x27;, 89, &amp;#x27;Skipped: Skipping 3D secure authentication test&amp;#x27;)\n&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_international_card_payment&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_international_card_payment&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_international_card_payment&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_email_receipt_sent_after_payment&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Skipped&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_email_receipt_sent_after_payment::setup&#34;, &#34;duration&#34;: &#34;0 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Skipped&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_verify_email_receipt_sent_after_payment::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;0 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;(&amp;#x27;/home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/tests/tests_ui/test_payment_flow.py&amp;#x27;, 102, &amp;#x27;Skipped: Skipping email receipt test&amp;#x27;)\n&#34;}], &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_payment_breakdown_with_tax_and_discount&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_payment_breakdown_with_tax_and_discount&#34;, &#34;duration&#34;: &#34;42 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;SRC/tests/tests_ui/test_payment_flow.py::TestPaymentFlowOnUI::test_validate_payment_breakdown_with_tax_and_discount&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;42 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}]}, &#34;renderCollapsed&#34;: [&#34;passed&#34;], &#34;initialSort&#34;: &#34;result&#34;, &#34;title&#34;: &#34;report.html&#34;}"></div>
+    <script>
+      (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const { getCollapsedCategory, setCollapsedIds } = require('./storage.js')
+
+class DataManager {
+    setManager(data) {
+        const collapsedCategories = [...getCollapsedCategory(data.renderCollapsed)]
+        const collapsedIds = []
+        const tests = Object.values(data.tests).flat().map((test, index) => {
+            const collapsed = collapsedCategories.includes(test.result.toLowerCase())
+            const id = `test_${index}`
+            if (collapsed) {
+                collapsedIds.push(id)
+            }
+            return {
+                ...test,
+                id,
+                collapsed,
+            }
+        })
+        const dataBlob = { ...data, tests }
+        this.data = { ...dataBlob }
+        this.renderData = { ...dataBlob }
+        setCollapsedIds(collapsedIds)
+    }
+
+    get allData() {
+        return { ...this.data }
+    }
+
+    resetRender() {
+        this.renderData = { ...this.data }
+    }
+
+    setRender(data) {
+        this.renderData.tests = [...data]
+    }
+
+    toggleCollapsedItem(id) {
+        this.renderData.tests = this.renderData.tests.map((test) =>
+            test.id === id ? { ...test, collapsed: !test.collapsed } : test,
+        )
+    }
+
+    set allCollapsed(collapsed) {
+        this.renderData = { ...this.renderData, tests: [...this.renderData.tests.map((test) => (
+            { ...test, collapsed }
+        ))] }
+    }
+
+    get testSubset() {
+        return [...this.renderData.tests]
+    }
+
+    get environment() {
+        return this.renderData.environment
+    }
+
+    get initialSort() {
+        return this.data.initialSort
+    }
+}
+
+module.exports = {
+    manager: new DataManager(),
+}
+
+},{"./storage.js":8}],2:[function(require,module,exports){
+const mediaViewer = require('./mediaviewer.js')
+const templateEnvRow = document.getElementById('template_environment_row')
+const templateResult = document.getElementById('template_results-table__tbody')
+
+function htmlToElements(html) {
+    const temp = document.createElement('template')
+    temp.innerHTML = html
+    return temp.content.childNodes
+}
+
+const find = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return elem.querySelector(selector)
+}
+
+const findAll = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return [...elem.querySelectorAll(selector)]
+}
+
+const dom = {
+    getStaticRow: (key, value) => {
+        const envRow = templateEnvRow.content.cloneNode(true)
+        const isObj = typeof value === 'object' && value !== null
+        const values = isObj ? Object.keys(value).map((k) => `${k}: ${value[k]}`) : null
+
+        const valuesElement = htmlToElements(
+            values ? `<ul>${values.map((val) => `<li>${val}</li>`).join('')}<ul>` : `<div>${value}</div>`)[0]
+        const td = findAll('td', envRow)
+        td[0].textContent = key
+        td[1].appendChild(valuesElement)
+
+        return envRow
+    },
+    getResultTBody: ({ testId, id, log, extras, resultsTableRow, tableHtml, result, collapsed }) => {
+        const resultBody = templateResult.content.cloneNode(true)
+        resultBody.querySelector('tbody').classList.add(result.toLowerCase())
+        resultBody.querySelector('tbody').id = testId
+        resultBody.querySelector('.collapsible').dataset.id = id
+
+        resultsTableRow.forEach((html) => {
+            const t = document.createElement('template')
+            t.innerHTML = html
+            resultBody.querySelector('.collapsible').appendChild(t.content)
+        })
+
+        if (log) {
+            // Wrap lines starting with "E" with span.error to color those lines red
+            const wrappedLog = log.replace(/^E.*$/gm, (match) => `<span class="error">${match}</span>`)
+            resultBody.querySelector('.log').innerHTML = wrappedLog
+        } else {
+            resultBody.querySelector('.log').remove()
+        }
+
+        if (collapsed) {
+            resultBody.querySelector('.collapsible > td')?.classList.add('collapsed')
+            resultBody.querySelector('.extras-row').classList.add('hidden')
+        } else {
+            resultBody.querySelector('.collapsible > td')?.classList.remove('collapsed')
+        }
+
+        const media = []
+        extras?.forEach(({ name, format_type, content }) => {
+            if (['image', 'video'].includes(format_type)) {
+                media.push({ path: content, name, format_type })
+            }
+
+            if (format_type === 'html') {
+                resultBody.querySelector('.extraHTML').insertAdjacentHTML('beforeend', `<div>${content}</div>`)
+            }
+        })
+        mediaViewer.setup(resultBody, media)
+
+        // Add custom html from the pytest_html_results_table_html hook
+        tableHtml?.forEach((item) => {
+            resultBody.querySelector('td[class="extra"]').insertAdjacentHTML('beforeend', item)
+        })
+
+        return resultBody
+    },
+}
+
+module.exports = {
+    dom,
+    htmlToElements,
+    find,
+    findAll,
+}
+
+},{"./mediaviewer.js":6}],3:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const storageModule = require('./storage.js')
+
+const getFilteredSubSet = (filter) =>
+    manager.allData.tests.filter(({ result }) => filter.includes(result.toLowerCase()))
+
+const doInitFilter = () => {
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+}
+
+const doFilter = (type, show) => {
+    if (show) {
+        storageModule.showCategory(type)
+    } else {
+        storageModule.hideCategory(type)
+    }
+
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+
+    const sortColumn = storageModule.getSort()
+    doSort(sortColumn, true)
+}
+
+module.exports = {
+    doFilter,
+    doInitFilter,
+}
+
+},{"./datamanager.js":1,"./sort.js":7,"./storage.js":8}],4:[function(require,module,exports){
+const { redraw, bindEvents, renderStatic } = require('./main.js')
+const { doInitFilter } = require('./filter.js')
+const { doInitSort } = require('./sort.js')
+const { manager } = require('./datamanager.js')
+const data = JSON.parse(document.getElementById('data-container').dataset.jsonblob)
+
+function init() {
+    manager.setManager(data)
+    doInitFilter()
+    doInitSort()
+    renderStatic()
+    redraw()
+    bindEvents()
+}
+
+init()
+
+},{"./datamanager.js":1,"./filter.js":3,"./main.js":5,"./sort.js":7}],5:[function(require,module,exports){
+const { dom, find, findAll } = require('./dom.js')
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const { doFilter } = require('./filter.js')
+const {
+    getVisible,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    getSortDirection,
+    possibleFilters,
+} = require('./storage.js')
+
+const removeChildren = (node) => {
+    while (node.firstChild) {
+        node.removeChild(node.firstChild)
+    }
+}
+
+const renderStatic = () => {
+    const renderEnvironmentTable = () => {
+        const environment = manager.environment
+        const rows = Object.keys(environment).map((key) => dom.getStaticRow(key, environment[key]))
+        const table = document.getElementById('environment')
+        removeChildren(table)
+        rows.forEach((row) => table.appendChild(row))
+    }
+    renderEnvironmentTable()
+}
+
+const addItemToggleListener = (elem) => {
+    elem.addEventListener('click', ({ target }) => {
+        const id = target.parentElement.dataset.id
+        manager.toggleCollapsedItem(id)
+
+        const collapsedIds = getCollapsedIds()
+        if (collapsedIds.includes(id)) {
+            const updated = collapsedIds.filter((item) => item !== id)
+            setCollapsedIds(updated)
+        } else {
+            collapsedIds.push(id)
+            setCollapsedIds(collapsedIds)
+        }
+        redraw()
+    })
+}
+
+const renderContent = (tests) => {
+    const sortAttr = getSort(manager.initialSort)
+    const sortAsc = JSON.parse(getSortDirection())
+    const rows = tests.map(dom.getResultTBody)
+    const table = document.getElementById('results-table')
+    const tableHeader = document.getElementById('results-table-head')
+
+    const newTable = document.createElement('table')
+    newTable.id = 'results-table'
+
+    // remove all sorting classes and set the relevant
+    findAll('.sortable', tableHeader).forEach((elem) => elem.classList.remove('asc', 'desc'))
+    tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
+    newTable.appendChild(tableHeader)
+
+    if (!rows.length) {
+        const emptyTable = document.getElementById('template_results-table__body--empty').content.cloneNode(true)
+        newTable.appendChild(emptyTable)
+    } else {
+        rows.forEach((row) => {
+            if (!!row) {
+                findAll('.collapsible td:not(.col-links', row).forEach(addItemToggleListener)
+                find('.logexpander', row).addEventListener('click',
+                    (evt) => evt.target.parentNode.classList.toggle('expanded'),
+                )
+                newTable.appendChild(row)
+            }
+        })
+    }
+
+    table.replaceWith(newTable)
+}
+
+const renderDerived = () => {
+    const currentFilter = getVisible()
+    possibleFilters.forEach((result) => {
+        const input = document.querySelector(`input[data-test-result="${result}"]`)
+        input.checked = currentFilter.includes(result)
+    })
+}
+
+const bindEvents = () => {
+    const filterColumn = (evt) => {
+        const { target: element } = evt
+        const { testResult } = element.dataset
+
+        doFilter(testResult, element.checked)
+        const collapsedIds = getCollapsedIds()
+        const updated = manager.renderData.tests.map((test) => {
+            return {
+                ...test,
+                collapsed: collapsedIds.includes(test.id),
+            }
+        })
+        manager.setRender(updated)
+        redraw()
+    }
+
+    const header = document.getElementById('environment-header')
+    header.addEventListener('click', () => {
+        const table = document.getElementById('environment')
+        table.classList.toggle('hidden')
+        header.classList.toggle('collapsed')
+    })
+
+    findAll('input[name="filter_checkbox"]').forEach((elem) => {
+        elem.addEventListener('click', filterColumn)
+    })
+
+    findAll('.sortable').forEach((elem) => {
+        elem.addEventListener('click', (evt) => {
+            const { target: element } = evt
+            const { columnType } = element.dataset
+            doSort(columnType)
+            redraw()
+        })
+    })
+
+    document.getElementById('show_all_details').addEventListener('click', () => {
+        manager.allCollapsed = false
+        setCollapsedIds([])
+        redraw()
+    })
+    document.getElementById('hide_all_details').addEventListener('click', () => {
+        manager.allCollapsed = true
+        const allIds = manager.renderData.tests.map((test) => test.id)
+        setCollapsedIds(allIds)
+        redraw()
+    })
+}
+
+const redraw = () => {
+    const { testSubset } = manager
+
+    renderContent(testSubset)
+    renderDerived()
+}
+
+module.exports = {
+    redraw,
+    bindEvents,
+    renderStatic,
+}
+
+},{"./datamanager.js":1,"./dom.js":2,"./filter.js":3,"./sort.js":7,"./storage.js":8}],6:[function(require,module,exports){
+class MediaViewer {
+    constructor(assets) {
+        this.assets = assets
+        this.index = 0
+    }
+
+    nextActive() {
+        this.index = this.index === this.assets.length - 1 ? 0 : this.index + 1
+        return [this.activeFile, this.index]
+    }
+
+    prevActive() {
+        this.index = this.index === 0 ? this.assets.length - 1 : this.index -1
+        return [this.activeFile, this.index]
+    }
+
+    get currentIndex() {
+        return this.index
+    }
+
+    get activeFile() {
+        return this.assets[this.index]
+    }
+}
+
+
+const setup = (resultBody, assets) => {
+    if (!assets.length) {
+        resultBody.querySelector('.media').classList.add('hidden')
+        return
+    }
+
+    const mediaViewer = new MediaViewer(assets)
+    const container = resultBody.querySelector('.media-container')
+    const leftArrow = resultBody.querySelector('.media-container__nav--left')
+    const rightArrow = resultBody.querySelector('.media-container__nav--right')
+    const mediaName = resultBody.querySelector('.media__name')
+    const counter = resultBody.querySelector('.media__counter')
+    const imageEl = resultBody.querySelector('img')
+    const sourceEl = resultBody.querySelector('source')
+    const videoEl = resultBody.querySelector('video')
+
+    const setImg = (media, index) => {
+        if (media?.format_type === 'image') {
+            imageEl.src = media.path
+
+            imageEl.classList.remove('hidden')
+            videoEl.classList.add('hidden')
+        } else if (media?.format_type === 'video') {
+            sourceEl.src = media.path
+
+            videoEl.classList.remove('hidden')
+            imageEl.classList.add('hidden')
+        }
+
+        mediaName.innerText = media?.name
+        counter.innerText = `${index + 1} / ${assets.length}`
+    }
+    setImg(mediaViewer.activeFile, mediaViewer.currentIndex)
+
+    const moveLeft = () => {
+        const [media, index] = mediaViewer.prevActive()
+        setImg(media, index)
+    }
+    const doRight = () => {
+        const [media, index] = mediaViewer.nextActive()
+        setImg(media, index)
+    }
+    const openImg = () => {
+        window.open(mediaViewer.activeFile.path, '_blank')
+    }
+    if (assets.length === 1) {
+        container.classList.add('media-container--fullscreen')
+    } else {
+        leftArrow.addEventListener('click', moveLeft)
+        rightArrow.addEventListener('click', doRight)
+    }
+    imageEl.addEventListener('click', openImg)
+}
+
+module.exports = {
+    setup,
+}
+
+},{}],7:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const storageModule = require('./storage.js')
+
+const genericSort = (list, key, ascending, customOrder) => {
+    let sorted
+    if (customOrder) {
+        sorted = list.sort((a, b) => {
+            const aValue = a.result.toLowerCase()
+            const bValue = b.result.toLowerCase()
+
+            const aIndex = customOrder.findIndex((item) => item.toLowerCase() === aValue)
+            const bIndex = customOrder.findIndex((item) => item.toLowerCase() === bValue)
+
+            // Compare the indices to determine the sort order
+            return aIndex - bIndex
+        })
+    } else {
+        sorted = list.sort((a, b) => a[key] === b[key] ? 0 : a[key] > b[key] ? 1 : -1)
+    }
+
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const durationSort = (list, ascending) => {
+    const parseDuration = (duration) => {
+        if (duration.includes(':')) {
+            // If it's in the format "HH:mm:ss"
+            const [hours, minutes, seconds] = duration.split(':').map(Number)
+            return (hours * 3600 + minutes * 60 + seconds) * 1000
+        } else {
+            // If it's in the format "nnn ms"
+            return parseInt(duration)
+        }
+    }
+    const sorted = list.sort((a, b) => parseDuration(a['duration']) - parseDuration(b['duration']))
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const doInitSort = () => {
+    const type = storageModule.getSort(manager.initialSort)
+    const ascending = storageModule.getSortDirection()
+    const list = manager.testSubset
+    const initialOrder = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed', 'Skipped', 'Passed']
+
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    if (type?.toLowerCase() === 'original') {
+        manager.setRender(list)
+    } else {
+        let sortedList
+        switch (type) {
+        case 'duration':
+            sortedList = durationSort(list, ascending)
+            break
+        case 'result':
+            sortedList = genericSort(list, type, ascending, initialOrder)
+            break
+        default:
+            sortedList = genericSort(list, type, ascending)
+            break
+        }
+        manager.setRender(sortedList)
+    }
+}
+
+const doSort = (type, skipDirection) => {
+    const newSortType = storageModule.getSort(manager.initialSort) !== type
+    const currentAsc = storageModule.getSortDirection()
+    let ascending
+    if (skipDirection) {
+        ascending = currentAsc
+    } else {
+        ascending = newSortType ? false : !currentAsc
+    }
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    const list = manager.testSubset
+    const sortedList = type === 'duration' ? durationSort(list, ascending) : genericSort(list, type, ascending)
+    manager.setRender(sortedList)
+}
+
+module.exports = {
+    doInitSort,
+    doSort,
+}
+
+},{"./datamanager.js":1,"./storage.js":8}],8:[function(require,module,exports){
+const possibleFilters = [
+    'passed',
+    'skipped',
+    'failed',
+    'error',
+    'xfailed',
+    'xpassed',
+    'rerun',
+]
+
+const getVisible = () => {
+    const url = new URL(window.location.href)
+    const settings = new URLSearchParams(url.search).get('visible')
+    const lower = (item) => {
+        const lowerItem = item.toLowerCase()
+        if (possibleFilters.includes(lowerItem)) {
+            return lowerItem
+        }
+        return null
+    }
+    return settings === null ?
+        possibleFilters :
+        [...new Set(settings?.split(',').map(lower).filter((item) => item))]
+}
+
+const hideCategory = (categoryToHide) => {
+    const url = new URL(window.location.href)
+    const visibleParams = new URLSearchParams(url.search).get('visible')
+    const currentVisible = visibleParams ? visibleParams.split(',') : [...possibleFilters]
+    const settings = [...new Set(currentVisible)].filter((f) => f !== categoryToHide).join(',')
+
+    url.searchParams.set('visible', settings)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const showCategory = (categoryToShow) => {
+    if (typeof window === 'undefined') {
+        return
+    }
+    const url = new URL(window.location.href)
+    const currentVisible = new URLSearchParams(url.search).get('visible')?.split(',').filter(Boolean) ||
+        [...possibleFilters]
+    const settings = [...new Set([categoryToShow, ...currentVisible])]
+    const noFilter = possibleFilters.length === settings.length || !settings.length
+
+    noFilter ? url.searchParams.delete('visible') : url.searchParams.set('visible', settings.join(','))
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getSort = (initialSort) => {
+    const url = new URL(window.location.href)
+    let sort = new URLSearchParams(url.search).get('sort')
+    if (!sort) {
+        sort = initialSort || 'result'
+    }
+    return sort
+}
+
+const setSort = (type) => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('sort', type)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getCollapsedCategory = (renderCollapsed) => {
+    let categories
+    if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href)
+        const collapsedItems = new URLSearchParams(url.search).get('collapsed')
+        switch (true) {
+        case !renderCollapsed && collapsedItems === null:
+            categories = ['passed']
+            break
+        case collapsedItems?.length === 0 || /^["']{2}$/.test(collapsedItems):
+            categories = []
+            break
+        case /^all$/.test(collapsedItems) || collapsedItems === null && /^all$/.test(renderCollapsed):
+            categories = [...possibleFilters]
+            break
+        default:
+            categories = collapsedItems?.split(',').map((item) => item.toLowerCase()) || renderCollapsed
+            break
+        }
+    } else {
+        categories = []
+    }
+    return categories
+}
+
+const getSortDirection = () => JSON.parse(sessionStorage.getItem('sortAsc')) || false
+const setSortDirection = (ascending) => sessionStorage.setItem('sortAsc', ascending)
+
+const getCollapsedIds = () => JSON.parse(sessionStorage.getItem('collapsedIds')) || []
+const setCollapsedIds = (list) => sessionStorage.setItem('collapsedIds', JSON.stringify(list))
+
+module.exports = {
+    getVisible,
+    hideCategory,
+    showCategory,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    setSort,
+    getSortDirection,
+    setSortDirection,
+    getCollapsedCategory,
+    possibleFilters,
+}
+
+},{}]},{},[4]);
+    </script>
+  </footer>
+</html>
