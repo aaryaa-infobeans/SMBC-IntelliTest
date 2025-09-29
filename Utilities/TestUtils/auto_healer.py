@@ -141,8 +141,8 @@ class AutoHealer:
         Returns:
             None (let the test fail naturally)
         """
-        import traceback
         import inspect
+        import traceback
         
         try:
             # Get the calling test file and line number from stack trace
