@@ -51,15 +51,15 @@ on:
       - completed
 
 jobs:
-#  run_sca_first_if_manual:
-#    if: ${{ github.event_name == 'workflow_dispatch' }}   # Only run if triggered manually
-#    uses: ./.github/workflows/WF-SCA.yml   # Reuse SCA workflow
-#    secrets: inherit
+  run_sca_first_if_manual:
+    if: ${{ github.event_name == 'workflow_dispatch' }}   # Only run if triggered manually
+    uses: ./.github/workflows/WF-SCA.yml   # Reuse SCA workflow
+    secrets: inherit
 
   test-execution:
     # Ensure SCA runs and succeeds first on manual trigger; on other triggers, proceed normally
-#    needs: run_sca_first_if_manual
-    # Run only when:
+    needs: run_sca_first_if_manual
+          # Run only when:
     # - Manual trigger and reusable SCA succeeded, OR
     # - Triggered by workflow_run and upstream SCA concluded success.
     # Use always() to avoid auto-skip when 'needs' is skipped on non-manual triggers.
