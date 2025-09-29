@@ -8,6 +8,8 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    
 
 env:
   # AutoHealer Configuration
@@ -54,7 +56,7 @@ jobs:
         AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
       run: |
         # Run tests with AutoHealer pytest plugin
-        pytest -v \
+        pytest SRC\tests\tests_ui\test_login.py::TestLogin -v \
           --html=${{ env.PYTEST_HTML_REPORT }} \
           --junitxml=${{ env.JUNIT_XML }} \
           --alluredir=${{ env.ALLURE_RESULTS_DIR }} \
