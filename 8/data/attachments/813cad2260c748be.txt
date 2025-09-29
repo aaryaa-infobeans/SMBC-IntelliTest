@@ -1,8 +1,0 @@
-INFO     TestAutomationFramework:logger.py:84 Session created successfully
-INFO     TestAutomationFramework:logger.py:84 Making POST request to /booking, with kwargs: {'data': '{"firstname": "Jennifer", "lastname": "Sims", "totalprice": 6500, "depositpaid": true, "bookingdates": {"checkin": "1973-09-30", "checkout": "1971-06-14"}, "additionalneeds": "Allow capital big throw water follow. Trial himself seven art.\\nAs national hair world start once. Movie trial budget seven certainly experience first condition."}', 'timeout': 30}
-INFO     TestAutomationFramework:logger.py:84 POST request made successfully: 200
-INFO     TestAutomationFramework:logger.py:84 Request time taken by __post_request: 0.04022502899169922
-INFO     TestAutomationFramework:logger.py:84 Request made successfully: 200
-INFO     TestAutomationFramework:logger.py:84 Booking ID: 5615
-INFO     TestAutomationFramework:logger.py:84 Session closed successfully
-INFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0009169578552246094
