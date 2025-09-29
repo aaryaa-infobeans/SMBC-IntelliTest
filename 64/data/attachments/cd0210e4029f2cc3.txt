@@ -1,0 +1,7 @@
+INFO     TestAutomationFramework:logger.py:84 Session created successfully
+INFO     TestAutomationFramework:logger.py:84 Making GET request to /booking, with kwargs: {'timeout': 30}
+INFO     TestAutomationFramework:logger.py:84 GET request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Request time taken by __get_request: 0.34827208518981934
+INFO     TestAutomationFramework:logger.py:84 Request made successfully: 200
+INFO     TestAutomationFramework:logger.py:84 Session closed successfully
+INFO     TestAutomationFramework:logger.py:84 Request time taken by close_session: 0.0014264583587646484
