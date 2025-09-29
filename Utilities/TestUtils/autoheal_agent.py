@@ -13,6 +13,7 @@ REPO_NAME = os.getenv("GITHUB_REPOSITORY")
 BASE_BRANCH = os.getenv("GITHUB_REF_NAME", "main")
 BRANCH_PREFIX = "autoheal/"
 
+
 # Initialize Azure OpenAI client with validation
 def get_openai_client():
     """Initialize and return Azure OpenAI client with proper validation."""
@@ -22,16 +23,15 @@ def get_openai_client():
     if not AZURE_OPENAI_ENDPOINT:
         print("❌ AZURE_OPENAI_ENDPOINT not found in environment variables")
         return None
-        
+
     try:
         return AzureOpenAI(
-            api_key=OPENAI_API_KEY,
-            api_version="2024-05-01-preview",
-            azure_endpoint=AZURE_OPENAI_ENDPOINT
+            api_key=OPENAI_API_KEY, api_version="2024-05-01-preview", azure_endpoint=AZURE_OPENAI_ENDPOINT
         )
     except Exception as e:
         print(f"❌ Failed to initialize Azure OpenAI client: {e}")
         return None
+
 
 client = get_openai_client()
 
@@ -55,7 +55,7 @@ def ai_autoheal_failure(test_name, failure_log, dom_snapshot=""):
             "explanation": "Azure OpenAI client not properly initialized",
             "patch": "",
         }
-    
+
     try:
         response = client.chat.completions.create(
             model=AZURE_OPENAI_DEPLOYMENT,
@@ -186,24 +186,29 @@ def create_manual_review_pr(test_name, failure_log, patch_content):
         if not GITHUB_TOKEN or not REPO_NAME:
             print("❌ GitHub configuration not available for manual PR creation")
             return None
-            
-        branch_name = f"{BRANCH_PREFIX}manual-review_{test_name.replace('/', '_').replace('::', '_')}_{os.urandom(4).hex()}"
-        
+
+        branch_name = (
+            f"{BRANCH_PREFIX}manual-review_{test_name.replace('/', '_').replace('::', '_')}_{os.urandom(4).hex()}"
+        )
+
         # Create manual review file
         review_file = f"MANUAL_REVIEW_{test_name.replace('/', '_').replace('::', '_')}.md"
         with open(review_file, "w") as f:
             f.write(patch_content)
-            
+
         # Git operations
         subprocess.run(["git", "checkout", "-b", branch_name], check=True)
         subprocess.run(["git", "add", review_file], check=True)
-        subprocess.run(["git", "commit", "-m", f"📋 Manual Review: {test_name}\n\nTest failure requires manual investigation"], check=True)
+        subprocess.run(
+            ["git", "commit", "-m", f"📋 Manual Review: {test_name}\n\nTest failure requires manual investigation"],
+            check=True,
+        )
         subprocess.run(["git", "push", "origin", branch_name], check=True)
 
         # Create PR
         gh = Github(GITHUB_TOKEN)
         repo = gh.get_repo(REPO_NAME)
-        
+
         pr_body = f"""## 📋 Manual Review Required
 
 **Test Case:** `{test_name}`
@@ -229,26 +234,26 @@ def create_manual_review_pr(test_name, failure_log, patch_content):
 ---
 *This PR was created automatically for manual investigation of test failures.*
 """
-        
+
         pr = repo.create_pull(
             title=f"📋 Manual Review: {test_name}",
             body=pr_body,
             head=branch_name,
             base=BASE_BRANCH,
         )
-        
+
         # Add labels
         try:
             pr.add_to_labels("manual-review", "test-failure", "needs-investigation")
         except Exception as e:
             print(f"⚠️ Could not add labels to manual review PR: {e}")
-            
+
         # Clean up review file
         if os.path.exists(review_file):
             os.remove(review_file)
-            
+
         return pr.html_url
-        
+
     except Exception as e:
         print(f"❌ Failed to create manual review PR for {test_name}: {e}")
         return None
