@@ -68,7 +68,7 @@ def parse_locator_failures_from_test_results(test_data: dict) -> List[LocatorFai
     Returns:
         List of LocatorFailure objects containing failing locator info
     """
-    failures = []
+    failures: List[LocatorFailure] = []
 
     # Handle pytest-json-report format
     if "tests" in test_data:
@@ -96,7 +96,7 @@ def extract_locator_info_from_error(test_name: str, error_log: str) -> List[Loca
     - Element not found errors
     - Timeout waiting for locator errors
     """
-    failures = []
+    failures: List[LocatorFailure] = []
 
     # Common patterns for locator failures
     locator_patterns = [
@@ -309,22 +309,22 @@ def create_locator_fix_patch(failure: LocatorFailure, new_locator: str) -> str:
         if modified_line == original_line:
             print(f"⚠️  Locator '{failure.failing_locator}' not found on line {failure.line_number}")
             print("🔍 Searching entire file for the locator...")
-            
+
             # Search for the locator in the entire file
             found_line_index = None
             for i, line in enumerate(lines):
-                if failure.failing_locator in line and ('=' in line or 'locator' in line.lower()):
+                if failure.failing_locator in line and ("=" in line or "locator" in line.lower()):
                     found_line_index = i
                     original_line = line
                     modified_line = line.replace(f'"{failure.failing_locator}"', f'"{new_locator}"')
                     if modified_line == original_line:
                         modified_line = line.replace(f"'{failure.failing_locator}'", f"'{new_locator}'")
-                    
+
                     if modified_line != original_line:
                         print(f"✅ Found locator on line {i + 1}: {line.strip()}")
                         failure.line_number = i + 1  # Update the line number
                         break
-            
+
             if found_line_index is None:
                 print(f"❌ Could not find locator '{failure.failing_locator}' anywhere in the file")
                 return ""
