@@ -36,7 +36,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0  # Required for git operations in AutoHealer
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GH_TOKEN }}
     
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -51,7 +51,7 @@ jobs:
     
     - name: Run tests with AutoHealer
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
       run: |
@@ -127,5 +127,5 @@ jobs:
         echo "- GITHUB_ACTIONS: $GITHUB_ACTIONS"
         echo "- GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
         echo "- AUTOHEALER_ENABLE_PR: $AUTOHEALER_ENABLE_PR"
-        echo "- Token configured: ${{ secrets.GITHUB_TOKEN != '' }}"
+        echo "- Token configured: ${{ secrets.GH_TOKEN != '' }}"
         echo "- OpenAI configured: ${{ secrets.OPENAI_API_KEY != '' }}"
