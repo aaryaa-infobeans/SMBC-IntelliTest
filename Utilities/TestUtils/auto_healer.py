@@ -5,6 +5,7 @@ This utility provides AI-powered element location healing when standard locators
 
 import os
 import time
+import json
 from typing import Any, Dict, Optional, Tuple
 
 from openai import AzureOpenAI
@@ -799,6 +800,8 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
 
             logger.info(f"Azure OpenAI {gpt_model} model - Raw Response for healing {request_type} : {response}")
             ai_response = response.choices[0].message.content.strip()
+            # Parse JSON string to dict
+            ai_response = json.loads(ai_response)
             logger.info(f"Azure OpenAI {gpt_model} model - suggested fix: {ai_response['patch']} with confidence {ai_response['confidence']}  and explanation: {ai_response['explanation']} ")
             return ai_response["patch"]
 
