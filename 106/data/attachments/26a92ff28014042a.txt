@@ -1,0 +1,403 @@
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Setting up HomePage tests...
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Healing with AI: Requesting alternative_locator from OpenAI with prompt: You are an expert QA automation engineer using Playwright. Your task is to analyze the failed locator and suggest a better CSS selector or XPath that can be used with page.locator().
+
+**CRITICAL RULES**:
+1. **Be Precise**: Your selectors MUST target exactly one element.
+2. **Return CSS Selectors or XPath**: Only return selectors that work with page.locator(), NOT getByRole() or other Playwright methods.
+
+**PREFERRED LOCATOR STRATEGIES** (in order of preference):
+1. **Test IDs and Data Attributes** (most reliable):
+   - `[data-testid='submit-btn']`
+   - `[data-test='login-button']`
+   - `[data-cy='username-input']`
+
+2. **Semantic HTML attributes**:
+   - `[aria-label='Submit form']`
+   - `[title='Close dialog']`
+   - `input[placeholder='Enter username']`
+   - `img[alt='Company logo']`
+
+3. **ID and Name attributes**:
+   - `#submit-button`
+   - `input[name='username']`
+   - `form[id='login-form']`
+
+4. **Class-based selectors** (be specific):
+   - `.submit-btn.primary`
+   - `.form-input.username`
+   - `button.btn-primary`
+
+5. **Attribute combinations**:
+   - `input[type='password'][name='password']`
+   - `button[type='submit'][class*='primary']`
+   - `a[href*='login'][class='nav-link']`
+
+6. **Text-based CSS selectors**:
+   - `button:has-text('Submit')`
+   - `a:has-text('Login')`
+   - `span:text('Error message')`
+
+7. **XPath** (when CSS is not sufficient):
+   - `//button[text()='Submit']`
+   - `//input[@placeholder='Username']`
+   - `//div[contains(@class,'error') and contains(text(),'Invalid')]`
+
+**VERIFICATION CHECKLIST**:
+Before finalizing a selector, verify:
+1. It matches exactly one element
+2. It's not too generic (avoid single class names like .btn)
+3. It's not overly complex (keep it maintainable)
+4. It's stable (won't break with minor UI changes)
+5. It works with page.locator() method
+
+**COMMON PITFALLS TO AVOID**:
+- Don't use position-based selectors (e.g., :nth-child) unless absolutely necessary
+- Don't rely on dynamic class names that include hashes or numbers
+- Don't use selectors that match multiple elements
+- Don't return getByRole(), getByText(), or other Playwright methods
+
+**EXAMPLES OF GOOD LOCATORS**:
+- `[data-testid='password-input']`
+- `#login-button`
+- `input[name='username'][type='text']`
+- `button[aria-label='Submit login form']`
+- `//button[text()='Login' and @type='submit']`
+
+**IMPORTANT**: 
+1. Return ONLY CSS selectors or XPath that work with page.locator()
+2. Do NOT return getByRole(), getByText(), getByLabel() or similar methods
+3. Make selectors as specific as needed to target exactly one element
+4. Prefer CSS selectors over XPath when possible
+
+**HEALING CONTEXT**:
+- Failed locator: '#passwd'
+- Element description: 'password input field'
+- Error: Element not found: #passwd
+- Page context: {'url': 'https://www.saucedemo.com/v1/', 'title': 'Swag Labs', 'viewport': {'width': 1280, 'height': 720}, 'timestamp': '2025-09-30 07:09:02', 'visible_text': 'Accepted usernames are:\nstandard_user\nlocked_out_user\nproblem_user\nperformance_glitch_user\n\nPassword for all users:\nsecret_sauce'}
+- DOM snapshot available for analysis
+
+**TASK**: Analyze the failed locator and suggest a better, more robust CSS selector or XPath for the 'password input field' element.
+
+**OUTPUT**: Return ONLY a CSS selector or XPath string that works with page.locator(). 
+Examples: 
+- "#password" 
+- "[data-testid='submit-btn']"
+- "input[name='password'][type='password']"
+- "//button[text()='Login']"
+
+Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw selectors only.
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 Azure OpenAI gpt-3.5-turbo model - Raw Response for healing alternative_locator : ChatCompletion(id='chatcmpl-CLOlq4RvC26crTSyjAfQPeFi51ZuL', choices=[Choice(finish_reason='stop', index=0, logprobs=None, message=ChatCompletionMessage(content='{\n    "issue_type": "CSS Selector",\n    "confidence": 0.9,\n    "explanation": "The failed locator \'#passwd\' is not a specific or reliable selector. To target the \'password input field\' element more precisely, a better CSS selector would be \'input[type=password]\' which selects input elements with type \'password\'. This selector is more robust and aligns with the preferred locator strategies.",\n    "patch": "input[type=password]"\n}', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None), content_filter_results={'hate': {'filtered': False, 'severity': 'safe'}, 'protected_material_code': {'filtered': False, 'detected': False}, 'protected_material_text': {'filtered': False, 'detected': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}})], created=1759216142, model='gpt-3.5-turbo-0125', object='chat.completion', service_tier=None, system_fingerprint='fp_0165350fbb', usage=CompletionUsage(completion_tokens=95, prompt_tokens=961, total_tokens=1056, completion_tokens_details=None, prompt_tokens_details=None), prompt_filter_results=[{'prompt_index': 0, 'content_filter_results': {'hate': {'filtered': False, 'severity': 'safe'}, 'jailbreak': {'filtered': False, 'detected': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}}])
+ERROR    TestAutomationFramework:logger.py:94 Error querying OpenAI: string indices must be integers
+INFO     TestAutomationFramework:logger.py:84 Falling back to heuristic suggestions on failure from Azure OpenAI.
+INFO     TestAutomationFramework:logger.py:84 Using fallback locator suggestion logic
+INFO     TestAutomationFramework:logger.py:84 Adding new failure: #passwd -> None
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 1 failures)
+WARNING  TestAutomationFramework:logger.py:89 🎯 Captured locator failure for PR creation: #passwd -> None
+INFO     TestAutomationFramework:logger.py:84 AI healing attempt 1 for: password input field
+INFO     TestAutomationFramework:logger.py:84 DOM snapshot saved: reports/dom_snapshot_password_input_field_20250930-070903.html
+INFO     TestAutomationFramework:logger.py:84 Healing with AI: Requesting alternative_locator from OpenAI with prompt: You are an expert QA automation engineer using Playwright. Your task is to analyze the failed locator and suggest a better CSS selector or XPath that can be used with page.locator().
+
+**CRITICAL RULES**:
+1. **Be Precise**: Your selectors MUST target exactly one element.
+2. **Return CSS Selectors or XPath**: Only return selectors that work with page.locator(), NOT getByRole() or other Playwright methods.
+
+**PREFERRED LOCATOR STRATEGIES** (in order of preference):
+1. **Test IDs and Data Attributes** (most reliable):
+   - `[data-testid='submit-btn']`
+   - `[data-test='login-button']`
+   - `[data-cy='username-input']`
+
+2. **Semantic HTML attributes**:
+   - `[aria-label='Submit form']`
+   - `[title='Close dialog']`
+   - `input[placeholder='Enter username']`
+   - `img[alt='Company logo']`
+
+3. **ID and Name attributes**:
+   - `#submit-button`
+   - `input[name='username']`
+   - `form[id='login-form']`
+
+4. **Class-based selectors** (be specific):
+   - `.submit-btn.primary`
+   - `.form-input.username`
+   - `button.btn-primary`
+
+5. **Attribute combinations**:
+   - `input[type='password'][name='password']`
+   - `button[type='submit'][class*='primary']`
+   - `a[href*='login'][class='nav-link']`
+
+6. **Text-based CSS selectors**:
+   - `button:has-text('Submit')`
+   - `a:has-text('Login')`
+   - `span:text('Error message')`
+
+7. **XPath** (when CSS is not sufficient):
+   - `//button[text()='Submit']`
+   - `//input[@placeholder='Username']`
+   - `//div[contains(@class,'error') and contains(text(),'Invalid')]`
+
+**VERIFICATION CHECKLIST**:
+Before finalizing a selector, verify:
+1. It matches exactly one element
+2. It's not too generic (avoid single class names like .btn)
+3. It's not overly complex (keep it maintainable)
+4. It's stable (won't break with minor UI changes)
+5. It works with page.locator() method
+
+**COMMON PITFALLS TO AVOID**:
+- Don't use position-based selectors (e.g., :nth-child) unless absolutely necessary
+- Don't rely on dynamic class names that include hashes or numbers
+- Don't use selectors that match multiple elements
+- Don't return getByRole(), getByText(), or other Playwright methods
+
+**EXAMPLES OF GOOD LOCATORS**:
+- `[data-testid='password-input']`
+- `#login-button`
+- `input[name='username'][type='text']`
+- `button[aria-label='Submit login form']`
+- `//button[text()='Login' and @type='submit']`
+
+**IMPORTANT**: 
+1. Return ONLY CSS selectors or XPath that work with page.locator()
+2. Do NOT return getByRole(), getByText(), getByLabel() or similar methods
+3. Make selectors as specific as needed to target exactly one element
+4. Prefer CSS selectors over XPath when possible
+
+**HEALING CONTEXT**:
+- Failed locator: '#passwd'
+- Element description: 'password input field'
+- Error: Element not found: #passwd
+- Page context: {'url': 'https://www.saucedemo.com/v1/', 'title': 'Swag Labs', 'viewport': {'width': 1280, 'height': 720}, 'timestamp': '2025-09-30 07:09:03', 'visible_text': 'Accepted usernames are:\nstandard_user\nlocked_out_user\nproblem_user\nperformance_glitch_user\n\nPassword for all users:\nsecret_sauce'}
+- DOM snapshot available for analysis
+
+**TASK**: Analyze the failed locator and suggest a better, more robust CSS selector or XPath for the 'password input field' element.
+
+**OUTPUT**: Return ONLY a CSS selector or XPath string that works with page.locator(). 
+Examples: 
+- "#password" 
+- "[data-testid='submit-btn']"
+- "input[name='password'][type='password']"
+- "//button[text()='Login']"
+
+Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw selectors only.
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 Azure OpenAI gpt-3.5-turbo model - Raw Response for healing alternative_locator : ChatCompletion(id='chatcmpl-CLOlr3GjjPVrVioumCvaIweHRKTY6', choices=[Choice(finish_reason='stop', index=0, logprobs=None, message=ChatCompletionMessage(content='{\n    "issue_type": "CSS Selector",\n    "confidence": 0.9,\n    "explanation": "The failed locator \'#passwd\' is not specific and might not be stable. To improve the selector, we can target the password input field more precisely using its type attribute. A more robust CSS selector would be \'input[type=password]\' which directly targets the password input field.",\n    "patch": "input[type=password]"\n}', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None), content_filter_results={'hate': {'filtered': False, 'severity': 'safe'}, 'protected_material_code': {'filtered': False, 'detected': False}, 'protected_material_text': {'filtered': False, 'detected': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}})], created=1759216143, model='gpt-3.5-turbo-0125', object='chat.completion', service_tier=None, system_fingerprint='fp_0165350fbb', usage=CompletionUsage(completion_tokens=89, prompt_tokens=961, total_tokens=1050, completion_tokens_details=None, prompt_tokens_details=None), prompt_filter_results=[{'prompt_index': 0, 'content_filter_results': {'hate': {'filtered': False, 'severity': 'safe'}, 'jailbreak': {'filtered': False, 'detected': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}}])
+ERROR    TestAutomationFramework:logger.py:94 Error querying OpenAI: string indices must be integers
+INFO     TestAutomationFramework:logger.py:84 Falling back to heuristic suggestions on failure from Azure OpenAI.
+INFO     TestAutomationFramework:logger.py:84 Using fallback locator suggestion logic
+INFO     TestAutomationFramework:logger.py:84 AI healing attempt 2 for: password input field
+INFO     TestAutomationFramework:logger.py:84 DOM snapshot saved: reports/dom_snapshot_password_input_field_20250930-070905.html
+INFO     TestAutomationFramework:logger.py:84 Healing with AI: Requesting alternative_locator from OpenAI with prompt: You are an expert QA automation engineer using Playwright. Your task is to analyze the failed locator and suggest a better CSS selector or XPath that can be used with page.locator().
+
+**CRITICAL RULES**:
+1. **Be Precise**: Your selectors MUST target exactly one element.
+2. **Return CSS Selectors or XPath**: Only return selectors that work with page.locator(), NOT getByRole() or other Playwright methods.
+
+**PREFERRED LOCATOR STRATEGIES** (in order of preference):
+1. **Test IDs and Data Attributes** (most reliable):
+   - `[data-testid='submit-btn']`
+   - `[data-test='login-button']`
+   - `[data-cy='username-input']`
+
+2. **Semantic HTML attributes**:
+   - `[aria-label='Submit form']`
+   - `[title='Close dialog']`
+   - `input[placeholder='Enter username']`
+   - `img[alt='Company logo']`
+
+3. **ID and Name attributes**:
+   - `#submit-button`
+   - `input[name='username']`
+   - `form[id='login-form']`
+
+4. **Class-based selectors** (be specific):
+   - `.submit-btn.primary`
+   - `.form-input.username`
+   - `button.btn-primary`
+
+5. **Attribute combinations**:
+   - `input[type='password'][name='password']`
+   - `button[type='submit'][class*='primary']`
+   - `a[href*='login'][class='nav-link']`
+
+6. **Text-based CSS selectors**:
+   - `button:has-text('Submit')`
+   - `a:has-text('Login')`
+   - `span:text('Error message')`
+
+7. **XPath** (when CSS is not sufficient):
+   - `//button[text()='Submit']`
+   - `//input[@placeholder='Username']`
+   - `//div[contains(@class,'error') and contains(text(),'Invalid')]`
+
+**VERIFICATION CHECKLIST**:
+Before finalizing a selector, verify:
+1. It matches exactly one element
+2. It's not too generic (avoid single class names like .btn)
+3. It's not overly complex (keep it maintainable)
+4. It's stable (won't break with minor UI changes)
+5. It works with page.locator() method
+
+**COMMON PITFALLS TO AVOID**:
+- Don't use position-based selectors (e.g., :nth-child) unless absolutely necessary
+- Don't rely on dynamic class names that include hashes or numbers
+- Don't use selectors that match multiple elements
+- Don't return getByRole(), getByText(), or other Playwright methods
+
+**EXAMPLES OF GOOD LOCATORS**:
+- `[data-testid='password-input']`
+- `#login-button`
+- `input[name='username'][type='text']`
+- `button[aria-label='Submit login form']`
+- `//button[text()='Login' and @type='submit']`
+
+**IMPORTANT**: 
+1. Return ONLY CSS selectors or XPath that work with page.locator()
+2. Do NOT return getByRole(), getByText(), getByLabel() or similar methods
+3. Make selectors as specific as needed to target exactly one element
+4. Prefer CSS selectors over XPath when possible
+
+**HEALING CONTEXT**:
+- Failed locator: '#passwd'
+- Element description: 'password input field'
+- Error: Element not found: #passwd
+- Page context: {'url': 'https://www.saucedemo.com/v1/', 'title': 'Swag Labs', 'viewport': {'width': 1280, 'height': 720}, 'timestamp': '2025-09-30 07:09:05', 'visible_text': 'Accepted usernames are:\nstandard_user\nlocked_out_user\nproblem_user\nperformance_glitch_user\n\nPassword for all users:\nsecret_sauce'}
+- DOM snapshot available for analysis
+
+**TASK**: Analyze the failed locator and suggest a better, more robust CSS selector or XPath for the 'password input field' element.
+
+**OUTPUT**: Return ONLY a CSS selector or XPath string that works with page.locator(). 
+Examples: 
+- "#password" 
+- "[data-testid='submit-btn']"
+- "input[name='password'][type='password']"
+- "//button[text()='Login']"
+
+Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw selectors only.
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 Azure OpenAI gpt-3.5-turbo model - Raw Response for healing alternative_locator : ChatCompletion(id='chatcmpl-CLOltducfQRWGXFUR0vHeycjnzuXB', choices=[Choice(finish_reason='stop', index=0, logprobs=None, message=ChatCompletionMessage(content='{\n    "issue_type": "CSS Selector",\n    "confidence": 0.9,\n    "explanation": "The failed locator \'#passwd\' is not specific and might not be stable. To target the \'password input field\' element more precisely, a better CSS selector would be \'input[type=password]\'. This selector targets input elements with the type attribute set to \'password\', ensuring a more accurate match.",\n    "patch": "input[type=password]"\n}', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None), content_filter_results={'hate': {'filtered': False, 'severity': 'safe'}, 'protected_material_code': {'filtered': False, 'detected': False}, 'protected_material_text': {'filtered': False, 'detected': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}})], created=1759216145, model='gpt-3.5-turbo-0125', object='chat.completion', service_tier=None, system_fingerprint='fp_0165350fbb', usage=CompletionUsage(completion_tokens=94, prompt_tokens=961, total_tokens=1055, completion_tokens_details=None, prompt_tokens_details=None), prompt_filter_results=[{'prompt_index': 0, 'content_filter_results': {'hate': {'filtered': False, 'severity': 'safe'}, 'jailbreak': {'filtered': False, 'detected': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}}])
+ERROR    TestAutomationFramework:logger.py:94 Error querying OpenAI: string indices must be integers
+INFO     TestAutomationFramework:logger.py:84 Falling back to heuristic suggestions on failure from Azure OpenAI.
+INFO     TestAutomationFramework:logger.py:84 Using fallback locator suggestion logic
+INFO     TestAutomationFramework:logger.py:84 AI healing attempt 3 for: password input field
+INFO     TestAutomationFramework:logger.py:84 DOM snapshot saved: reports/dom_snapshot_password_input_field_20250930-070906.html
+INFO     TestAutomationFramework:logger.py:84 Healing with AI: Requesting alternative_locator from OpenAI with prompt: You are an expert QA automation engineer using Playwright. Your task is to analyze the failed locator and suggest a better CSS selector or XPath that can be used with page.locator().
+
+**CRITICAL RULES**:
+1. **Be Precise**: Your selectors MUST target exactly one element.
+2. **Return CSS Selectors or XPath**: Only return selectors that work with page.locator(), NOT getByRole() or other Playwright methods.
+
+**PREFERRED LOCATOR STRATEGIES** (in order of preference):
+1. **Test IDs and Data Attributes** (most reliable):
+   - `[data-testid='submit-btn']`
+   - `[data-test='login-button']`
+   - `[data-cy='username-input']`
+
+2. **Semantic HTML attributes**:
+   - `[aria-label='Submit form']`
+   - `[title='Close dialog']`
+   - `input[placeholder='Enter username']`
+   - `img[alt='Company logo']`
+
+3. **ID and Name attributes**:
+   - `#submit-button`
+   - `input[name='username']`
+   - `form[id='login-form']`
+
+4. **Class-based selectors** (be specific):
+   - `.submit-btn.primary`
+   - `.form-input.username`
+   - `button.btn-primary`
+
+5. **Attribute combinations**:
+   - `input[type='password'][name='password']`
+   - `button[type='submit'][class*='primary']`
+   - `a[href*='login'][class='nav-link']`
+
+6. **Text-based CSS selectors**:
+   - `button:has-text('Submit')`
+   - `a:has-text('Login')`
+   - `span:text('Error message')`
+
+7. **XPath** (when CSS is not sufficient):
+   - `//button[text()='Submit']`
+   - `//input[@placeholder='Username']`
+   - `//div[contains(@class,'error') and contains(text(),'Invalid')]`
+
+**VERIFICATION CHECKLIST**:
+Before finalizing a selector, verify:
+1. It matches exactly one element
+2. It's not too generic (avoid single class names like .btn)
+3. It's not overly complex (keep it maintainable)
+4. It's stable (won't break with minor UI changes)
+5. It works with page.locator() method
+
+**COMMON PITFALLS TO AVOID**:
+- Don't use position-based selectors (e.g., :nth-child) unless absolutely necessary
+- Don't rely on dynamic class names that include hashes or numbers
+- Don't use selectors that match multiple elements
+- Don't return getByRole(), getByText(), or other Playwright methods
+
+**EXAMPLES OF GOOD LOCATORS**:
+- `[data-testid='password-input']`
+- `#login-button`
+- `input[name='username'][type='text']`
+- `button[aria-label='Submit login form']`
+- `//button[text()='Login' and @type='submit']`
+
+**IMPORTANT**: 
+1. Return ONLY CSS selectors or XPath that work with page.locator()
+2. Do NOT return getByRole(), getByText(), getByLabel() or similar methods
+3. Make selectors as specific as needed to target exactly one element
+4. Prefer CSS selectors over XPath when possible
+
+**HEALING CONTEXT**:
+- Failed locator: '#passwd'
+- Element description: 'password input field'
+- Error: Element not found: #passwd
+- Page context: {'url': 'https://www.saucedemo.com/v1/', 'title': 'Swag Labs', 'viewport': {'width': 1280, 'height': 720}, 'timestamp': '2025-09-30 07:09:06', 'visible_text': 'Accepted usernames are:\nstandard_user\nlocked_out_user\nproblem_user\nperformance_glitch_user\n\nPassword for all users:\nsecret_sauce'}
+- DOM snapshot available for analysis
+
+**TASK**: Analyze the failed locator and suggest a better, more robust CSS selector or XPath for the 'password input field' element.
+
+**OUTPUT**: Return ONLY a CSS selector or XPath string that works with page.locator(). 
+Examples: 
+- "#password" 
+- "[data-testid='submit-btn']"
+- "input[name='password'][type='password']"
+- "//button[text()='Login']"
+
+Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw selectors only.
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 Azure OpenAI gpt-3.5-turbo model - Raw Response for healing alternative_locator : ChatCompletion(id='chatcmpl-CLOluTgX2hmCP6aVft0t44SFBIKLG', choices=[Choice(finish_reason='stop', index=0, logprobs=None, message=ChatCompletionMessage(content='{\n    "issue_type": "CSS Selector",\n    "confidence": 0.9,\n    "explanation": "The failed locator \'#passwd\' is not a specific or reliable selector. To target the \'password input field\' element more precisely, a better CSS selector would be \'input[type=password]\'. This selector targets input elements with the type attribute set to \'password\', ensuring a more accurate match to the desired element.",\n    "patch": "input[type=password]"\n}', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None), content_filter_results={'hate': {'filtered': False, 'severity': 'safe'}, 'protected_material_code': {'filtered': False, 'detected': False}, 'protected_material_text': {'filtered': False, 'detected': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}})], created=1759216146, model='gpt-3.5-turbo-0125', object='chat.completion', service_tier=None, system_fingerprint='fp_0165350fbb', usage=CompletionUsage(completion_tokens=97, prompt_tokens=961, total_tokens=1058, completion_tokens_details=None, prompt_tokens_details=None), prompt_filter_results=[{'prompt_index': 0, 'content_filter_results': {'hate': {'filtered': False, 'severity': 'safe'}, 'jailbreak': {'filtered': False, 'detected': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}}])
+ERROR    TestAutomationFramework:logger.py:94 Error querying OpenAI: string indices must be integers
+INFO     TestAutomationFramework:logger.py:84 Falling back to heuristic suggestions on failure from Azure OpenAI.
+INFO     TestAutomationFramework:logger.py:84 Using fallback locator suggestion logic
+ERROR    TestAutomationFramework:logger.py:94 Maximum healing attempts (3) reached for: password input field
+ERROR    TestAutomationFramework:logger.py:94 Fill action failed for '#passwd': Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#passwd") to be visible
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
