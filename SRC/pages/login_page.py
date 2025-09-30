@@ -10,7 +10,12 @@ logger = get_logger()
 class LoginPage(BasePage):
 
     __loc_username_input = "#user-name"
-    __loc_password_input = "#passwd"  # nosec - This is a CSS selector, not a real password
+    __loc_password_input = "{
+    "issue_type": "CSS Selector",
+    "confidence": 0.9,
+    "explanation": "The failed locator '#passwd' is not a specific or reliable selector. To target the 'password input field' element more precisely, a better CSS selector would be 'input[type=password]'. This selector targets input elements with the type attribute set to 'password', ensuring it is specific to the password input field.",
+    "patch": "input[type=password]"
+}"  # nosec - This is a CSS selector, not a real password
     __loc_login_button = "#login-button"
     __loc_error_message = "//h3[text()]"
     __loc_logout_button = '//*[contains(text(), "Lgout")]'
