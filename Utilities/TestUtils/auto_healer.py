@@ -789,7 +789,15 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a Playwright automation expert. Provide explaination, confidence score, and a patch (unified diff). Return JSON with: issue_type, confidence, explanation, patch",
+                        "content": f"""You are a Playwright automation expert.
+                                        Analyze the following prompt and 
+                                        Return only a JSON object with these fields: 
+                                        - "issue_type": type of locator problem (e.g., CSS Selector, XPath)
+                                        - "confidence": float between 0 and 1
+                                        - "explanation": short text explaining why the original locator failed
+                                        - "patch": the suggested alternative locator
+                                        Do not include any other metadata like role, logprobs, annotations, content_filter_results, or usage details.
+                                        Output valid JSON only"""
                     },
                     {"role": "user", "content": prompt},
                 ],
