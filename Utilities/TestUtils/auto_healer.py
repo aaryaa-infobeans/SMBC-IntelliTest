@@ -794,7 +794,7 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
                                         Return only a JSON object with these fields: 
                                         - "issue_type": type of locator problem (e.g., CSS Selector, XPath)
                                         - "confidence": float between 0 and 1
-                                        - "explanation": short text explaining why the original locator failed
+                                        - "explaination": short text explaining why the original locator failed
                                         - "patch": the suggested alternative locator
                                         Do not include any other metadata like role, logprobs, annotations, content_filter_results, or usage details.
                                         Output valid JSON only"""
