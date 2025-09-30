@@ -773,7 +773,7 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
         Returns:
             AI suggested locator string or None if failed
         """
-        logger.info(f"Requesting {request_type} from OpenAI")
+        logger.info(f"Healing with AI: Requesting {request_type} from OpenAI with prompt: {prompt}")
 
         try:
             client = get_client()
@@ -788,7 +788,7 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a Playwright automation expert. Provide only locator strings, no explanations.",
+                        "content": "You are a Playwright automation expert. Provide explanation, confidence score, and a patch (unified diff). Return JSON with: issue_type, confidence, explanation, patch",
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -796,6 +796,7 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
                 temperature=0.1,
             )
 
+            logger.info(f"OpenAI Response for locator healing {request_type} : {response}")
             ai_response = response.choices[0].message.content.strip()
             logger.info(f"OpenAI suggested locator: {ai_response}")
             return ai_response
