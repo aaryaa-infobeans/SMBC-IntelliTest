@@ -789,7 +789,7 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a Playwright automation expert. Provide explanation, confidence score, and a patch (unified diff). Return JSON with: issue_type, confidence, explanation, patch",
+                        "content": "You are a Playwright automation expert. Provide explaination, confidence score, and a patch (unified diff). Return JSON with: issue_type, confidence, explanation, patch",
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -799,10 +799,15 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
 
             logger.info(f"Azure OpenAI {gpt_model} model - Raw Response for healing {request_type} : {response}")
             ai_response = response.choices[0].message.content.strip()
-            # Parse JSON string to dict
-            ai_response = json.loads(ai_response)
-            logger.info(f"Azure OpenAI {gpt_model} model - suggested fix: {ai_response['patch']} with confidence {ai_response['confidence']}  and explanation: {ai_response['explanation']} ")
-            return ai_response["patch"]
+            # Convert the JSON string into a Python dictionary
+            healing_suggestion = json.loads(ai_response)
+
+            # Print the parsed values
+            logger.info(f"Issue Type: {healing_suggestion.get('issue_type')}")
+            logger.info(f"Confidence: {healing_suggestion.get('confidence')}")
+            logger.info(f"Explaination: {healing_suggestion.get('explaination')}")
+            logger.info(f"Patch (Alternative Locator): {healing_suggestion.get('patch')}")
+            return healing_suggestion.get('patch')
 
         except Exception as e:
             logger.error(f"Error querying OpenAI: {str(e)}")
