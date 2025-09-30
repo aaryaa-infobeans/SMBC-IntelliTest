@@ -120,5 +120,4 @@ Sample Commit
 Sample commit
 
 For questions or issues, contact the framework maintainer or raise an issue in the repository.
-Commit for Demo
 
