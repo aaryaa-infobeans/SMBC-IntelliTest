@@ -58,7 +58,7 @@ jobs:
 
   test-execution:
     # Ensure SCA runs and succeeds first on manual trigger; on other triggers, proceed normally
-    needs: run_sca_first_if_manual
+    # needs: run_sca_first_if_manual
           # Run only when:
     # - Manual trigger and reusable SCA succeeded, OR
     # - Triggered by workflow_run and upstream SCA concluded success.
