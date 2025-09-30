@@ -799,7 +799,7 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
 
             logger.info(f"Azure OpenAI {gpt_model} model - Raw Response for healing {request_type} : {response}")
             ai_response = response.choices[0].message.content.strip()
-            logger.info(f"Azure OpenAI {gpt_model} model - suggested fix: {ai_response["patch"]} with confidence {ai_response["confidence"]}  and explanation: {ai_response["explanation"]} ")
+            logger.info(f"Azure OpenAI {gpt_model} model - suggested fix: {ai_response['patch']} with confidence {ai_response['confidence']}  and explanation: {ai_response['explanation']} ")
             return ai_response["patch"]
 
         except Exception as e:
