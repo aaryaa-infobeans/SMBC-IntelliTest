@@ -1,0 +1,160 @@
+INFO     TestAutomationFramework:logger.py:84 Navigating to base URL: https://www.saucedemo.com/v1/
+DEBUG    TestAutomationFramework:logger.py:79 Setting up test base helpers
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+INFO     TestAutomationFramework:logger.py:84 AutoHealer initialized with OpenAI integration
+DEBUG    TestAutomationFramework:logger.py:79 Test base setup completed
+INFO     TestAutomationFramework:logger.py:84 Setting up OrderPage tests...
+INFO     TestAutomationFramework:logger.py:84 Logging in with username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering username: standard_user
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'standard_user' to element '#user-name'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: username input field using locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #user-name
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#user-name' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered username
+INFO     TestAutomationFramework:logger.py:84 Logging in with password: sec...
+DEBUG    TestAutomationFramework:logger.py:79 Entering password
+DEBUG    TestAutomationFramework:logger.py:79 Entering text:'secret_sauce' to element '#passwd'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: password input field using locator: #passwd
+WARNING  TestAutomationFramework:logger.py:89 Element not found with locator: #passwd
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in: /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py
+INFO     TestAutomationFramework:logger.py:84 Found locator '#passwd' declared in /home/runner/work/SMBC-IntelliTest/SMBC-IntelliTest/SRC/pages/login_page.py:13
+INFO     TestAutomationFramework:logger.py:84 Healing with AI: Requesting alternative_locator from OpenAI with prompt: You are an expert QA automation engineer using Playwright. Your task is to analyze the failed locator and suggest a better CSS selector or XPath that can be used with page.locator().
+
+**CRITICAL RULES**:
+1. **Be Precise**: Your selectors MUST target exactly one element.
+2. **Return CSS Selectors or XPath**: Only return selectors that work with page.locator(), NOT getByRole() or other Playwright methods.
+
+**PREFERRED LOCATOR STRATEGIES** (in order of preference):
+1. **Test IDs and Data Attributes** (most reliable):
+   - `[data-testid='submit-btn']`
+   - `[data-test='login-button']`
+   - `[data-cy='username-input']`
+
+2. **Semantic HTML attributes**:
+   - `[aria-label='Submit form']`
+   - `[title='Close dialog']`
+   - `input[placeholder='Enter username']`
+   - `img[alt='Company logo']`
+
+3. **ID and Name attributes**:
+   - `#submit-button`
+   - `input[name='username']`
+   - `form[id='login-form']`
+
+4. **Class-based selectors** (be specific):
+   - `.submit-btn.primary`
+   - `.form-input.username`
+   - `button.btn-primary`
+
+5. **Attribute combinations**:
+   - `input[type='password'][name='password']`
+   - `button[type='submit'][class*='primary']`
+   - `a[href*='login'][class='nav-link']`
+
+6. **Text-based CSS selectors**:
+   - `button:has-text('Submit')`
+   - `a:has-text('Login')`
+   - `span:text('Error message')`
+
+7. **XPath** (when CSS is not sufficient):
+   - `//button[text()='Submit']`
+   - `//input[@placeholder='Username']`
+   - `//div[contains(@class,'error') and contains(text(),'Invalid')]`
+
+**VERIFICATION CHECKLIST**:
+Before finalizing a selector, verify:
+1. It matches exactly one element
+2. It's not too generic (avoid single class names like .btn)
+3. It's not overly complex (keep it maintainable)
+4. It's stable (won't break with minor UI changes)
+5. It works with page.locator() method
+
+**COMMON PITFALLS TO AVOID**:
+- Don't use position-based selectors (e.g., :nth-child) unless absolutely necessary
+- Don't rely on dynamic class names that include hashes or numbers
+- Don't use selectors that match multiple elements
+- Don't return getByRole(), getByText(), or other Playwright methods
+
+**EXAMPLES OF GOOD LOCATORS**:
+- `[data-testid='password-input']`
+- `#login-button`
+- `input[name='username'][type='text']`
+- `button[aria-label='Submit login form']`
+- `//button[text()='Login' and @type='submit']`
+
+**IMPORTANT**: 
+1. Return ONLY CSS selectors or XPath that work with page.locator()
+2. Do NOT return getByRole(), getByText(), getByLabel() or similar methods
+3. Make selectors as specific as needed to target exactly one element
+4. Prefer CSS selectors over XPath when possible
+
+**HEALING CONTEXT**:
+- Failed locator: '#passwd'
+- Element description: 'password input field'
+- Error: Element not found: #passwd
+- Page context: {'url': 'https://www.saucedemo.com/v1/', 'title': 'Swag Labs', 'viewport': {'width': 1280, 'height': 720}, 'timestamp': '2025-09-30 07:54:41', 'visible_text': 'Accepted usernames are:\nstandard_user\nlocked_out_user\nproblem_user\nperformance_glitch_user\n\nPassword for all users:\nsecret_sauce'}
+- DOM snapshot available for analysis
+
+**TASK**: Analyze the failed locator and suggest a better, more robust CSS selector or XPath for the 'password input field' element.
+
+**OUTPUT**: Return ONLY a CSS selector or XPath string that works with page.locator(). 
+Examples: 
+- "#password" 
+- "[data-testid='submit-btn']"
+- "input[name='password'][type='password']"
+- "//button[text()='Login']"
+
+Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw selectors only.
+INFO     httpx:_client.py:1025 HTTP Request: POST https://automationhealing.openai.azure.com/openai/deployments/gpt-3.5-turbo/chat/completions?api-version=2024-05-01-preview "HTTP/1.1 200 OK"
+INFO     TestAutomationFramework:logger.py:84 Azure OpenAI gpt-3.5-turbo model - Raw Response for healing alternative_locator : ChatCompletion(id='chatcmpl-CLPU125IpvCM2J9VEHmRwQ12Vl6xz', choices=[Choice(finish_reason='stop', index=0, logprobs=None, message=ChatCompletionMessage(content='{\n    "issue_type": "CSS Selector",\n    "confidence": 0.9,\n    "explanation": "The failed locator \'#passwd\' is likely too generic and not specific enough to target the \'password input field\' element accurately. To provide a more robust selector, we can use a combination of attributes to target the password input field uniquely.",\n    "patch": "input[name=\'password\'][type=\'password\']"\n}', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None), content_filter_results={'hate': {'filtered': False, 'severity': 'safe'}, 'protected_material_code': {'filtered': False, 'detected': False}, 'protected_material_text': {'filtered': False, 'detected': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}})], created=1759218881, model='gpt-3.5-turbo-0125', object='chat.completion', service_tier=None, system_fingerprint='fp_0165350fbb', usage=CompletionUsage(completion_tokens=88, prompt_tokens=961, total_tokens=1049, completion_tokens_details=None, prompt_tokens_details=None), prompt_filter_results=[{'prompt_index': 0, 'content_filter_results': {'hate': {'filtered': False, 'severity': 'safe'}, 'jailbreak': {'filtered': False, 'detected': False}, 'self_harm': {'filtered': False, 'severity': 'safe'}, 'sexual': {'filtered': False, 'severity': 'safe'}, 'violence': {'filtered': False, 'severity': 'safe'}}}])
+INFO     TestAutomationFramework:logger.py:84 Azure OpenAI gpt-3.5-turbo model - suggested fix: input[name='password'][type='password'] with confidence 0.9  and explanation: The failed locator '#passwd' is likely too generic and not specific enough to target the 'password input field' element accurately. To provide a more robust selector, we can use a combination of attributes to target the password input field uniquely. 
+INFO     TestAutomationFramework:logger.py:84 ✅ AI suggested locator works: input[name='password'][type='password']
+DEBUG    TestAutomationFramework:logger.py:79 Loaded 3 existing failures
+INFO     TestAutomationFramework:logger.py:84 Skipping duplicate failure: #passwd
+INFO     TestAutomationFramework:logger.py:84 Saved captured failure to reports/captured_locator_failures.json (total: 3 failures)
+WARNING  TestAutomationFramework:logger.py:89 🎯 Captured locator failure for PR creation: #passwd -> input[name='password'][type='password']
+INFO     TestAutomationFramework:logger.py:84 Successfully filled element '#passwd' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully entered password
+INFO     TestAutomationFramework:logger.py:84 Clicking login button
+DEBUG    TestAutomationFramework:logger.py:79 Clicking login button
+DEBUG    TestAutomationFramework:logger.py:79 Clicking element '#login-button'
+INFO     TestAutomationFramework:logger.py:84 Attempting to locate element: login submit button using locator: #login-button
+INFO     TestAutomationFramework:logger.py:84 Successfully found element using original locator: #login-button
+INFO     TestAutomationFramework:logger.py:84 Successfully clicked element '#login-button' using AutoHealer
+INFO     TestAutomationFramework:logger.py:84 Successfully clicked login button
+INFO     TestAutomationFramework:logger.py:84 Login completed successfully
+INFO     TestAutomationFramework:logger.py:84 Login attempted with valid credentials, navigating to all items page.
+INFO     TestAutomationFramework:logger.py:84 STEP: Starting order creation process for product: Sauce Labs Bolt T-Shirt, quantity: 1
+INFO     TestAutomationFramework:logger.py:84 Step 1: Verifying cart is initially empty
+DEBUG    TestAutomationFramework:logger.py:79 Verifying cart item count, expected: 0
+INFO     TestAutomationFramework:logger.py:84 Cart is empty as expected
+INFO     TestAutomationFramework:logger.py:84 ✓ Cart verification completed - cart is empty
+INFO     TestAutomationFramework:logger.py:84 Step 2: Adding product 'Sauce Labs Bolt T-Shirt' to cart
+DEBUG    TestAutomationFramework:logger.py:79 Adding product 'Sauce Labs Bolt T-Shirt' to cart
+INFO     TestAutomationFramework:logger.py:84 Successfully added product 'Sauce Labs Bolt T-Shirt' to cart
+INFO     TestAutomationFramework:logger.py:84 ✓ Product 'Sauce Labs Bolt T-Shirt' added to cart successfully
+INFO     TestAutomationFramework:logger.py:84 Step 3: Verifying cart contains 1 item(s)
+DEBUG    TestAutomationFramework:logger.py:79 Verifying cart item count, expected: 1
+INFO     TestAutomationFramework:logger.py:84 Cart item count verification passed: 1 items
+INFO     TestAutomationFramework:logger.py:84 ✓ Cart item count verification passed - 1 item(s) in cart
+INFO     TestAutomationFramework:logger.py:84 Step 4: Navigating to cart page
+DEBUG    TestAutomationFramework:logger.py:79 Navigating to cart page
+INFO     TestAutomationFramework:logger.py:84 Successfully navigated to cart page
+INFO     TestAutomationFramework:logger.py:84 ✓ Successfully navigated to cart page
+INFO     TestAutomationFramework:logger.py:84 Step 5: Verifying cart page elements
+DEBUG    TestAutomationFramework:logger.py:79 Verifying cart page elements
+INFO     TestAutomationFramework:logger.py:84 Cart page verification completed successfully
+INFO     TestAutomationFramework:logger.py:84 ✓ Cart page verification completed successfully
+INFO     TestAutomationFramework:logger.py:84 Step 6: Verifying item details for 'Sauce Labs Bolt T-Shirt' in cart
+DEBUG    TestAutomationFramework:logger.py:79 Verifying item details for 'Sauce Labs Bolt T-Shirt' with quantity 1
+INFO     TestAutomationFramework:logger.py:84 Product 'Sauce Labs Bolt T-Shirt' found in cart
+INFO     TestAutomationFramework:logger.py:84 Product quantity verification passed for 'Sauce Labs Bolt T-Shirt'
+INFO     TestAutomationFramework:logger.py:84 ✓ Item details verification passed for 'Sauce Labs Bolt T-Shirt'
+INFO     TestAutomationFramework:logger.py:84 Step 7: Proceeding to checkout
+DEBUG    TestAutomationFramework:logger.py:79 Initiating product checkout
+INFO     TestAutomationFramework:logger.py:84 Successfully clicked checkout button and initiated checkout process
+INFO     TestAutomationFramework:logger.py:84 ✓ Checkout process initiated successfully
+INFO     TestAutomationFramework:logger.py:84 Step 8: Verifying checkout page
+DEBUG    TestAutomationFramework:logger.py:79 Verifying checkout page elements
+DEBUG    TestAutomationFramework:logger.py:79 Closing browser page
