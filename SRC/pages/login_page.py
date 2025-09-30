@@ -10,7 +10,7 @@ logger = get_logger()
 class LoginPage(BasePage):
 
     __loc_username_input = "#user-name"
-    __loc_password_input = "#passwd"  # nosec - This is a CSS selector, not a real password
+    __loc_password_input = "input#password[type='password']"  # nosec - This is a CSS selector, not a real password
     __loc_login_button = "#login-button"
     __loc_error_message = "//h3[text()]"
     __loc_logout_button = '//*[contains(text(), "Lgout")]'
