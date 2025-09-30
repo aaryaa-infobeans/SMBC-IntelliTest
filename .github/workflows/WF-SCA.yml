@@ -11,6 +11,7 @@ on:
 
 jobs:
   static-analysis:
+    name: Static Code Analysis
     runs-on: windows-latest
 
     steps:

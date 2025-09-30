@@ -45,19 +45,21 @@ on:
         required: false
         default: ""
 
-  # workflow_run:
-  #   workflows: ["WF-Static Code Analysis"]   # Name of first workflow
-  #   types:
-  #     - completed
+  workflow_run:
+    workflows: ["WF-Static Code Analysis"]   # Name of first workflow
+    types:
+      - completed
 
 jobs:
-  run_sca:
+  run_sca_first_if_manual:
+    if: ${{ github.event_name == 'workflow_dispatch' }}   # Only run if triggered manually
     uses: ./.github/workflows/WF-SCA.yml   # Reuse SCA workflow
     secrets: inherit
 
   test-execution:
     # Ensure SCA runs and succeeds first on manual trigger; on other triggers, proceed normally
-    needs: run_sca
+    name: Test Execution with AutoHeal
+    needs: run_sca_first_if_manual
           # Run only when:
     # - Manual trigger and reusable SCA succeeded, OR
     # - Triggered by workflow_run and upstream SCA concluded success.
