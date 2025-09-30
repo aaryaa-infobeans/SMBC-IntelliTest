@@ -107,8 +107,8 @@ jobs:
         run: |
           echo "latestCommitMessage=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
           echo "currentDateTime=$(date +'%Y-%m-%d %H-%M')" >> $GITHUB_ENV
-          echo "testExecutionStartedMessage=Project:SMR - Test Execution Started for RunId: ${{ github.run_id }} on ${{ env.currentDateTime }}, Branch: ${{ github.ref }}" >> $GITHUB_ENV
-          echo "testExecutionStartedTitle=Project:SMR - Test Execution Started" >> $GITHUB_ENV
+          echo "testExecutionStartedMessage=Project:SMBC-IntelliTest - Test Execution Started for RunId: ${{ github.run_id }} on ${{ env.currentDateTime }}, Branch: ${{ github.ref }}" >> $GITHUB_ENV
+          echo "testExecutionStartedTitle=Project:SMBC-IntelliTest - Test Execution Started" >> $GITHUB_ENV
       
       - name: Slack Notification - Start
         uses: rtCamp/action-slack-notify@v2
@@ -331,8 +331,8 @@ jobs:
           echo "TIMESTAMP=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_ENV
           echo "TIMESTAMPFORSUBJECT=$(date +'%m-%d-%Y %H:%M:%S')" >> $GITHUB_ENV
           echo "ZipReportName=ExecutionReport_$(date +'%Y-%m-%d_%H-%M-%S').zip" >> $GITHUB_ENV
-          echo "testExecutionCompletedMessage=Project:SMR - Test Execution Completed for RunId: ${{ github.run_id }} on ${{ env.currentDateTime }}, status: ${{ steps.execute_tests.outcome }} Branch: ${{ github.ref }}" >> $GITHUB_ENV
-          echo "testExecutionCompletedTitle=Project:SMR - Test Execution Completed" >> $GITHUB_ENV
+          echo "testExecutionCompletedMessage=Project:SMBC-IntelliTest - Test Execution Completed for RunId: ${{ github.run_id }} on ${{ env.currentDateTime }}, status: ${{ steps.execute_tests.outcome }} Branch: ${{ github.ref }}" >> $GITHUB_ENV
+          echo "testExecutionCompletedTitle=Project:SMBC-IntelliTest - Test Execution Completed" >> $GITHUB_ENV
 
       - name: Generate pytest report
         if: always()
@@ -368,7 +368,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pytest_execution_report
-          path: SMR_test_summary.pdf
+          path: SMBC-IntelliTest_test_summary.pdf
 
       - name: Upload test results to GitHub
         if: always()
@@ -379,7 +379,7 @@ jobs:
             test-results.xml
             test-results.json
             allure-results/
-            SMR_allure_report.html
+            SMBC-IntelliTest_allure_report.html
           retention-days: 30
 
       - name: Upload Allure Results
@@ -449,11 +449,11 @@ jobs:
           server_port: 587
           username: ${{ secrets.GMAIL_USERNAME }}
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          subject: "SMR Test Execution updates: ${{ env.TEST_FAILED == '1' && 'FAILED' || 'PASSED' }} at ${{ env.TIMESTAMPFORSUBJECT }}"
+          subject: "SMBC-IntelliTest Test Execution updates: ${{ env.TEST_FAILED == '1' && 'FAILED' || 'PASSED' }} at ${{ env.TIMESTAMPFORSUBJECT }}"
           to: ${{ secrets.NOTIFICATION_EMAIL }}
-          from: "SMR Testing Team <${{ secrets.GMAIL_USERNAME }}>"
+          from: "SMBC-IntelliTest Testing Team <${{ secrets.GMAIL_USERNAME }}>"
           html_body: ${{ steps.prepare-email.outputs.email_body }}
-          attachments: "${{ env.ZipReportName }},SMR_test_summary.pdf,SMR_allure_report.html"
+          attachments: "${{ env.ZipReportName }},SMBC-IntelliTest_test_summary.pdf,SMBC-IntelliTest_allure_report.html"
 
       - name: Slack Summary - Post execution
         if: always()

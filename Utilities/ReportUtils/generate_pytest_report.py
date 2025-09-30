@@ -26,7 +26,7 @@ class PytestReportGenerator:
 
     def __init__(self, results_file: str, output_file: Optional[str] = None, detailed: bool = False):
         self.results_file = Path(results_file)
-        self.output_file = Path(output_file) if output_file else self.results_file.parent / "SMR_test_summary.pdf"
+        self.output_file = Path(output_file) if output_file else self.results_file.parent / "SMBC-IntelliTest_test_summary.pdf"
         self.data: Optional[Dict[str, Any]] = None
         self.styles = getSampleStyleSheet()
         self.detailed = detailed
