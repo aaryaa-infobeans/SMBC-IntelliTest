@@ -2,10 +2,9 @@
 Auto Healer Utility for Playwright Test Automation
 This utility provides AI-powered element location healing when standard locators fail.
 """
-
+import json
 import os
 import time
-import json
 from typing import Any, Dict, Optional, Tuple
 
 from openai import AzureOpenAI
