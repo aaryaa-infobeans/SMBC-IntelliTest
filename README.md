@@ -116,6 +116,7 @@ SMBC-IntelliTest/
 - Check `pytest.ini` and `config.json` for correct configuration.
 
 ## Support
+Sample Commit
 Sample commit
 
 For questions or issues, contact the framework maintainer or raise an issue in the repository.
