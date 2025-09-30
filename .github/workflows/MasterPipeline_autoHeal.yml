@@ -164,10 +164,6 @@ jobs:
           path: |
             reports/**
 
-      # Auto-healing step removed - handled post-test execution 
-
- 
-
       - name: Execute Tests with pytest
         id: execute_tests  # Add this ID to reference the step
         # run when mode is not parallel-with-custom-runner
@@ -180,7 +176,7 @@ jobs:
           XRAY_API_BASE_URL: ${{ secrets.XRAY_BASE_URL || 'https://xray.cloud.getxray.app' }}
           XRAY_CLIENT_ID: ${{ secrets.XRAY_CLIENT_ID }}
           XRAY_CLIENT_SECRET: ${{ secrets.XRAY_CLIENT_SECRET }}
-          XRAY_TEST_PLAN_KEY: ${{ secrets.XRAY_TEST_PLAN_KEY }}
+          XRAY_TEST_PLAN_KEY: ${{ secrets.XRAY_TEST_PLAN_KEY || 'MYS-53' }}
           XRAY_EXECUTION_SUMMARY: Smoke ${{ env.currentDateTime }}
           XRAY_EXECUTION_DESC: Test Execution after commit - ${{ env.latestCommitMessage }}
 
@@ -205,7 +201,7 @@ jobs:
           if [ ! -z "${{ github.event.inputs.xray_test_args }}" ]; then
             TEST_ARGS="$TEST_ARGS ${{ github.event.inputs.xray_test_args }}"
           else
-            TEST_ARGS="$TEST_ARGS --testplan ${{ secrets.XRAY_TEST_PLAN_KEY }}"
+            TEST_ARGS="$TEST_ARGS --testplan ${{ secrets.XRAY_TEST_PLAN_KEY || 'MYS-53' }}"
           fi
 
           if [ "$parallel" = "true" ]; then
@@ -392,38 +388,40 @@ jobs:
         with:
           name: allure-results
           path: allure-results
+          
+      # To be used when GH -pages are subscribed =======until this marker below=================================================
+      # - name: Load test report history
+      #   uses: actions/checkout@v3
+      #   if: always()
+      #   continue-on-error: true
+      #   with:
+      #     ref: gh-pages
+      #     path: gh-pages
 
-      - name: Load test report history
-        uses: actions/checkout@v3
-        if: always()
-        continue-on-error: true
-        with:
-          ref: gh-pages
-          path: gh-pages
+      # - name: Build test report
+      #   uses: simple-elf/allure-report-action@v1.7
+      #   if: always()
+      #   with:
+      #     gh_pages: gh-pages
+      #     allure_history: allure-history
+      #     allure_results: allure-results
 
-      - name: Build test report
-        uses: simple-elf/allure-report-action@v1.7
-        if: always()
-        with:
-          gh_pages: gh-pages
-          allure_history: allure-history
-          allure_results: allure-results
-
-      - name: Publish test report
-        uses: peaceiris/actions-gh-pages@v3
-        if: always()
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: allure-history
-          force_orphan: true
+      # - name: Publish test report
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   if: always()
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_branch: gh-pages
+      #     publish_dir: allure-history
+      #     force_orphan: true
+      # =================================================================================
 
       - name: Prepare email HTML body
         id: prepare-email
         if: always()
         run: |
           # Export environment variables for the script
-          export TEST_RESULT="${{ steps.execute_tests.outcome == 'success' && 'PASSED' || 'FAILED' }}"
+          export TEST_RESULT="${{ env.TEST_FAILED == '1' && 'FAILED' || 'PASSED' }}"
           export TOTAL_TESTS="${{ steps.extract-stats.outputs.total }}"
           export PASSED_TESTS="${{ steps.extract-stats.outputs.passed }}"
           export FAILED_TESTS="${{ steps.extract-stats.outputs.failed }}"
@@ -451,7 +449,7 @@ jobs:
           server_port: 587
           username: ${{ secrets.GMAIL_USERNAME }}
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          subject: "SMR Test Execution updates: ${{ steps.execute_tests.outcome == 'success' && 'PASSED' || 'FAILED' }} at ${{ env.TIMESTAMPFORSUBJECT }}"
+          subject: "SMR Test Execution updates: ${{ env.TEST_FAILED == '1' && 'FAILED' || 'PASSED' }} at ${{ env.TIMESTAMPFORSUBJECT }}"
           to: ${{ secrets.NOTIFICATION_EMAIL }}
           from: "SMR Testing Team <${{ secrets.GMAIL_USERNAME }}>"
           html_body: ${{ steps.prepare-email.outputs.email_body }}
