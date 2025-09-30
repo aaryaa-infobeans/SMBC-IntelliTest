@@ -779,12 +779,13 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
             client = get_client()
             # Check if OpenAI client is available
             if not client.api_key:
-                logger.warning("OpenAI API key not available. Using fallback logic.")
+                logger.warning("Azure OpenAI API key not available. Using fallback logic.")
                 return self._fallback_locator_suggestion(prompt, request_type)
 
             # Call OpenAI API
+            gpt_model="gpt-3.5-turbo"
             response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model=gpt_model,
                 messages=[
                     {
                         "role": "system",
@@ -796,14 +797,14 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
                 temperature=0.1,
             )
 
-            logger.info(f"OpenAI Response for locator healing {request_type} : {response}")
+            logger.info(f"Azure OpenAI {gpt_model} model - Raw Response for healing {request_type} : {response}")
             ai_response = response.choices[0].message.content.strip()
-            logger.info(f"OpenAI suggested locator: {ai_response}")
-            return ai_response
+            logger.info(f"Azure OpenAI {gpt_model} model - suggested fix: {ai_response["patch"]} with confidence {ai_response["confidence"]}  and explanation: {ai_response["explanation"]} ")
+            return ai_response["patch"]
 
         except Exception as e:
             logger.error(f"Error querying OpenAI: {str(e)}")
-            logger.info("Falling back to heuristic suggestions")
+            logger.info("Falling back to heuristic suggestions on failure from Azure OpenAI.")
             return self._fallback_locator_suggestion(prompt, request_type)
 
     def _fallback_locator_suggestion(self, prompt: str, request_type: str) -> Optional[str]:
