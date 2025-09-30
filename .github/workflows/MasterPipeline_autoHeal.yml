@@ -51,21 +51,9 @@ on:
   #     - completed
 
 jobs:
-  # run_sca_first_if_manual:
-  #   if: ${{ github.event_name == 'workflow_dispatch' }}   # Only run if triggered manually
-  #   uses: ./.github/workflows/WF-SCA.yml   # Reuse SCA workflow
-  #   secrets: inherit
-
   run_sca:
-    name: Static Code Analysis
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Run SCA workflow
-        uses: ./.github/workflows/WF-SCA.yml
-        secrets: inherit
+    uses: ./.github/workflows/WF-SCA.yml   # Reuse SCA workflow
+    secrets: inherit
 
   test-execution:
     # Ensure SCA runs and succeeds first on manual trigger; on other triggers, proceed normally
