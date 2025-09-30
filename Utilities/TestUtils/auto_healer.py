@@ -509,7 +509,7 @@ class AutoHealer:
             Page context: {page_context}
             
             Please provide a more specific locator that will match only one element.
-            Return only the locator string, no explanation.
+            Return only the locator string, no explaination.
             """
 
             specific_locator = self._get_command_from_ai(ai_prompt, "specific_locator")
@@ -813,7 +813,7 @@ Do NOT return getByRole(), getByText(), or other Playwright methods. Return raw 
             # Print the parsed values
             logger.info(f"Issue Type: {healing_suggestion.get('issue_type')}")
             logger.info(f"Confidence: {healing_suggestion.get('confidence')}")
-            logger.info(f"Explaination: {healing_suggestion.get('explaination')}")
+            logger.info(f"Explaination: {healing_suggestion.get('explanation')}")
             logger.info(f"Patch (Alternative Locator): {healing_suggestion.get('patch')}")
             return healing_suggestion.get('patch')
 
