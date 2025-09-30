@@ -45,16 +45,16 @@ on:
         required: false
         default: ""
 
-  workflow_run:
-    workflows: ["WF-Static Code Analysis"]   # Name of first workflow
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["WF-Static Code Analysis"]   # Name of first workflow
+  #   types:
+  #     - completed
 
 jobs:
-  run_sca_first_if_manual:
-    if: ${{ github.event_name == 'workflow_dispatch' }}   # Only run if triggered manually
-    uses: ./.github/workflows/WF-SCA.yml   # Reuse SCA workflow
-    secrets: inherit
+  # run_sca_first_if_manual:
+  #   if: ${{ github.event_name == 'workflow_dispatch' }}   # Only run if triggered manually
+  #   uses: ./.github/workflows/WF-SCA.yml   # Reuse SCA workflow
+  #   secrets: inherit
 
   test-execution:
     # Ensure SCA runs and succeeds first on manual trigger; on other triggers, proceed normally
