@@ -226,7 +226,7 @@ jobs:
 
           else
             echo "➡ Running sequentially"
-            python -m pytest $TEST_ARGS --jira-xray --client-secret-auth --cloud -v --junitxml=test-results.xml --json-report --json-report-file=test-results.json || echo "TEST_FAILED=1" >> $GITHUB_ENV
+            python -m pytest $TEST_ARGS --testplan MYS-53 --jira-xray --client-secret-auth --cloud -v --junitxml=test-results.xml --json-report --json-report-file=test-results.json || echo "TEST_FAILED=1" >> $GITHUB_ENV
           fi
 
 
